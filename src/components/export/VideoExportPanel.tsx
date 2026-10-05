@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { RenderJob, Resolution, Framerate, VideoFormat, ColorCustomizerSettings, CreatorToolsSettings } from '../../types/motion.types';
+import type { RenderJob, Resolution, Framerate, VideoFormat, ColorCustomizerSettings, CreatorToolsSettings } from '../../types/motion.types';
 import { renderAnimationToVideo } from '../../services/encoder/videoExporter';
 import { Video, Film, Download, Trash2, CheckCircle2, Play, X, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface VideoExportPanelProps {
   proceduralCode: string;
@@ -28,13 +29,12 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
   const durationPresets = [5, 10, 15, 30];
 
   const handleStartRender = async () => {
-    // Compile function
     let compiledFunc: Function;
     try {
       compiledFunc = new Function(proceduralCode.trim())();
       if (typeof compiledFunc !== 'function') throw new Error('Code must return a render function');
     } catch (err: any) {
-      alert('Cannot render: Procedural code contains errors: ' + err.message);
+      toast.error('Cannot render: Procedural code contains syntax errors.');
       return;
     }
 
@@ -54,6 +54,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
     };
 
     setRenderQueue(prev => [newJob, ...prev]);
+    const renderToast = toast.loading(`Rendering ${resolution} (${duration}s @ ${framerate}fps)...`);
 
     try {
       const blob = await renderAnimationToVideo(
@@ -88,6 +89,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
             : j
         )
       );
+      toast.success(`Render complete! 4K video ready (${sizeMb} MB)`, { id: renderToast });
     } catch (err: any) {
       console.error('Render failed:', err);
       setRenderQueue(prev =>
@@ -97,7 +99,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
             : j
         )
       );
-      alert('Rendering failed: ' + err.message);
+      toast.error(`Rendering failed: ${err.message}`, { id: renderToast });
     }
   };
 
@@ -108,14 +110,17 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
     const ext = job.format === 'MOV' ? 'mov' : (job.format === 'MP4' ? 'mp4' : 'webm');
     a.download = `${job.id}_${job.resolution.split(' ')[0]}_${job.framerate}fps.${ext}`;
     a.click();
+    toast.success(`Downloading ${job.format} file...`);
   };
 
   const handleClearCompleted = () => {
     setRenderQueue(prev => prev.filter(j => j.status === 'RENDERING'));
+    toast.success('Completed queue items cleared');
   };
 
   const handleDeleteJob = (id: string) => {
     setRenderQueue(prev => prev.filter(j => j.id !== id));
+    toast('Render job deleted', { icon: '🗑️' });
   };
 
   return (
@@ -142,7 +147,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
                 <button
                   key={d}
                   onClick={() => setDuration(d)}
-                  className={`py-1.5 rounded-lg text-xs font-bold transition border ${
+                  className={`py-1.5 rounded-lg text-xs font-bold transition border cursor-pointer ${
                     duration === d
                       ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
                       : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -179,7 +184,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
                 <button
                   key={f.id}
                   onClick={() => setFormat(f.id as VideoFormat)}
-                  className={`py-2 px-1 rounded-lg text-xs font-bold transition text-center border ${
+                  className={`py-2 px-1 rounded-lg text-xs font-bold transition text-center border cursor-pointer ${
                     format === f.id
                       ? 'bg-red-600 text-white border-red-600 shadow-xs'
                       : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -232,7 +237,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setFramerate(30)}
-                className={`py-2 px-3 rounded-lg text-xs font-bold transition border ${
+                className={`py-2 px-3 rounded-lg text-xs font-bold transition border cursor-pointer ${
                   framerate === 30
                     ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -242,7 +247,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
               </button>
               <button
                 onClick={() => setFramerate(60)}
-                className={`py-2 px-3 rounded-lg text-xs font-bold transition border ${
+                className={`py-2 px-3 rounded-lg text-xs font-bold transition border cursor-pointer ${
                   framerate === 60
                     ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -291,7 +296,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
           {renderQueue.length > 0 && (
             <button
               onClick={handleClearCompleted}
-              className="text-[11px] font-bold text-slate-500 hover:text-red-600 underline"
+              className="text-[11px] font-bold text-slate-500 hover:text-red-600 underline cursor-pointer"
             >
               Clear Completed
             </button>
@@ -341,14 +346,14 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
                       <>
                         <button
                           onClick={() => setPreviewJob(job)}
-                          className="px-2.5 py-1 text-xs font-bold text-slate-800 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 transition flex items-center gap-1 shadow-2xs"
+                          className="px-2.5 py-1 text-xs font-bold text-slate-800 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 transition flex items-center gap-1 shadow-2xs cursor-pointer"
                         >
                           <Play className="w-3 h-3 text-red-600" />
                           Preview Video
                         </button>
                         <button
                           onClick={() => handleDownload(job)}
-                          className="px-3 py-1 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition flex items-center gap-1 shadow-xs"
+                          className="px-3 py-1 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition flex items-center gap-1 shadow-xs cursor-pointer"
                         >
                           <Download className="w-3.5 h-3.5" />
                           Download ({job.fileSizeMb || 34.5} MB)
@@ -357,7 +362,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
                     )}
                     <button
                       onClick={() => handleDeleteJob(job.id)}
-                      className="p-1 text-slate-400 hover:text-red-600"
+                      className="p-1 text-slate-400 hover:text-red-600 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -399,7 +404,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
               </div>
               <button
                 onClick={() => setPreviewJob(null)}
-                className="text-slate-400 hover:text-white p-1"
+                className="text-slate-400 hover:text-white p-1 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -424,13 +429,13 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPreviewJob(null)}
-                  className="px-4 py-1.5 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 rounded-lg"
+                  className="px-4 py-1.5 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 rounded-lg cursor-pointer"
                 >
                   Close Preview
                 </button>
                 <button
                   onClick={() => handleDownload(previewJob)}
-                  className="px-4 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg flex items-center gap-1.5 shadow-sm"
+                  className="px-4 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />
                   Download Video

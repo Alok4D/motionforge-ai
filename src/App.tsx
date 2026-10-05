@@ -11,10 +11,11 @@ import { SeoPanel } from './components/seo-expert/SeoPanel';
 import { VideoExportPanel } from './components/export/VideoExportPanel';
 
 import { DEFAULT_TEMPLATES } from './constants/defaultPresets';
-import { AnimationTemplate, MotionStyle, AspectRatio, ColorCustomizerSettings, CreatorToolsSettings } from './types/motion.types';
-import { StockMetadata } from './types/seo.types';
+import type { AnimationTemplate, MotionStyle, AspectRatio, ColorCustomizerSettings, CreatorToolsSettings } from './types/motion.types';
+import type { StockMetadata } from './types/seo.types';
 import { generateMotionFromImage, editCurrentMotion, generateFromTextPrompt } from './services/gemini/geminiClient';
 import { generateLocalStockMetadata } from './services/seo/seoService';
+import { Toaster, toast } from 'react-hot-toast';
 
 export function App() {
   // Animation & Template state
@@ -64,9 +65,13 @@ export function App() {
 
   // Generate Motion from Image (AI Vision Call)
   const handleGenerateFromImage = async () => {
-    if (!imagePreview) return;
+    if (!imagePreview) {
+      toast.error('Please upload or paste an image first');
+      return;
+    }
     setIsProcessing(true);
     setStatusMessage('Analyzing image & synthesizing procedural code with Gemini AI...');
+    const loadingToast = toast.loading('Gemini AI is analyzing visual geometry & generating 60FPS motion code...');
 
     const res = await generateMotionFromImage(imagePreview, style, aspectRatio);
     setIsProcessing(false);
@@ -76,9 +81,10 @@ export function App() {
       setStatusMessage('✓ Procedural motion graphic synthesized successfully!');
       const newTitle = `Procedural ${style} Motion Matrix`;
       setMetadata(generateLocalStockMetadata(newTitle, style));
+      toast.success('Motion graphic synthesized successfully!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 4000);
     } else {
-      alert(`AI Generation Notice: ${res.error}\n(Make sure to add Gemini API Keys in the Key Pool)`);
+      toast.error(`AI Generation Failed: ${res.error || 'Check API Key Pool'}`, { id: loadingToast, duration: 5000 });
       setStatusMessage(null);
     }
   };
@@ -87,6 +93,8 @@ export function App() {
   const handleCreateVariation = async () => {
     setIsProcessing(true);
     setStatusMessage('Generating creative variation...');
+    const loadingToast = toast.loading('Generating creative variation...');
+
     const instruction = 'Create a fresh visual variation of this procedural motion concept with alternative orbital dynamics and particle flow while keeping the aesthetic harmony.';
     const res = await editCurrentMotion(currentCode, instruction);
     setIsProcessing(false);
@@ -94,18 +102,23 @@ export function App() {
     if (res.success && res.code) {
       setCurrentCode(res.code);
       setStatusMessage('✓ Variation synthesized successfully!');
+      toast.success('Variation synthesized successfully!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
-      alert(`Notice: ${res.error}`);
+      toast.error(`Variation Error: ${res.error}`, { id: loadingToast });
       setStatusMessage(null);
     }
   };
 
   // Edit Current Motion (Natural Language Bengali / English prompt)
   const handleEditCurrentMotion = async () => {
-    if (!promptText.trim()) return;
+    if (!promptText.trim()) {
+      toast.error('Please enter a modification prompt first');
+      return;
+    }
     setIsProcessing(true);
     setStatusMessage('Applying natural language prompt modifications to current code...');
+    const loadingToast = toast.loading('Applying modifications with Gemini AI...');
 
     const res = await editCurrentMotion(currentCode, promptText.trim());
     setIsProcessing(false);
@@ -114,18 +127,23 @@ export function App() {
       setCurrentCode(res.code);
       setStatusMessage('✓ Motion successfully modified!');
       setMetadata(generateLocalStockMetadata(promptText, style));
+      toast.success('Motion successfully modified!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
-      alert(`Notice: ${res.error}`);
+      toast.error(`Modification Error: ${res.error}`, { id: loadingToast });
       setStatusMessage(null);
     }
   };
 
   // Generate from Text Prompt
   const handleGenerateFromPrompt = async () => {
-    if (!promptText.trim()) return;
+    if (!promptText.trim()) {
+      toast.error('Please enter a prompt first');
+      return;
+    }
     setIsProcessing(true);
     setStatusMessage('Synthesizing procedural code from prompt...');
+    const loadingToast = toast.loading('Synthesizing procedural code from prompt...');
 
     const res = await generateFromTextPrompt(promptText.trim(), style, aspectRatio);
     setIsProcessing(false);
@@ -134,9 +152,10 @@ export function App() {
       setCurrentCode(res.code);
       setStatusMessage('✓ Generated from prompt successfully!');
       setMetadata(generateLocalStockMetadata(promptText, style));
+      toast.success('Generated from prompt successfully!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
-      alert(`Notice: ${res.error}`);
+      toast.error(`Generation Error: ${res.error}`, { id: loadingToast });
       setStatusMessage(null);
     }
   };
@@ -154,15 +173,32 @@ export function App() {
       prompt: promptText,
     };
     setTemplates(prev => [newPreset, ...prev]);
-    alert(`Preset "${name}" saved to library!`);
+    toast.success(`Preset "${name}" saved to library!`);
   };
 
   const handleDeletePreset = (id: string) => {
     setTemplates(prev => prev.filter(t => t.id !== id));
+    toast('Preset deleted', { icon: '🗑️' });
   };
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans">
+      {/* Toast notifications container */}
+      <Toaster 
+        position="top-right" 
+        toastOptions={{
+          duration: 3500,
+          style: {
+            background: '#0f172a',
+            color: '#f8fafc',
+            fontSize: '12px',
+            fontWeight: 600,
+            borderRadius: '10px',
+            border: '1px solid #334155'
+          }
+        }} 
+      />
+
       {/* Top Header */}
       <Header pipelineActive={true} />
 

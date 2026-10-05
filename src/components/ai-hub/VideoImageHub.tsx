@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
-import { MotionStyle, AspectRatio } from '../../types/motion.types';
+import type { MotionStyle, AspectRatio } from '../../types/motion.types';
 import { Upload, Sparkles, Wand2, Copy, Trash2, Image as ImageIcon } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface VideoImageHubProps {
   imagePreview: string | null;
@@ -36,6 +37,7 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
     const reader = new FileReader();
     reader.onload = (event) => {
       setImagePreview(event.target?.result as string);
+      toast.success('Image loaded successfully!');
     };
     reader.readAsDataURL(file);
   };
@@ -50,21 +52,24 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
           const reader = new FileReader();
           reader.onload = (e) => {
             setImagePreview(e.target?.result as string);
+            toast.success('Image pasted from clipboard!');
           };
           reader.readAsDataURL(blob);
           return;
         }
       }
-      alert('No image found in clipboard. Please copy an image or screenshot first (Ctrl+C / PrtSc).');
+      toast.error('No image found in clipboard. Copy an image first (Ctrl+C / PrtSc).');
     } catch (err) {
       console.warn('Clipboard read error, fallback to prompt', err);
       const url = prompt('Enter image URL or paste base64:');
-      if (url) setImagePreview(url);
+      if (url) {
+        setImagePreview(url);
+        toast.success('Image URL set!');
+      }
     }
   };
 
   const handleRandomImage = () => {
-    // High quality sample procedural graphics
     const samples = [
       'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1507499739999-097706ad8914?w=800&auto=format&fit=crop&q=80',
@@ -73,6 +78,7 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
     ];
     const picked = samples[Math.floor(Math.random() * samples.length)];
     setImagePreview(picked);
+    toast.success('Random stock asset loaded!');
   };
 
   return (
@@ -96,15 +102,15 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
               <button
                 onClick={handlePasteClipboard}
                 title="Copy / Replace"
-                className="px-2 py-1 text-[11px] font-bold text-slate-300 hover:text-white flex items-center gap-1"
+                className="px-2 py-1 text-[11px] font-bold text-slate-300 hover:text-white flex items-center gap-1 cursor-pointer"
               >
                 <Copy className="w-3 h-3" />
                 Copy
               </button>
               <button
-                onClick={() => setImagePreview(null)}
+                onClick={() => { setImagePreview(null); toast('Image removed', { icon: '🗑️' }); }}
                 title="Remove Image"
-                className="p-1 text-slate-400 hover:text-red-400"
+                className="p-1 text-slate-400 hover:text-red-400 cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -136,14 +142,14 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={handlePasteClipboard}
-            className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition flex items-center justify-center gap-1"
+            className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition flex items-center justify-center gap-1 cursor-pointer"
           >
             <ImageIcon className="w-3.5 h-3.5" />
             Paste Image
           </button>
           <button
             onClick={handleRandomImage}
-            className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition flex items-center justify-center gap-1"
+            className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition flex items-center justify-center gap-1 cursor-pointer"
           >
             <Wand2 className="w-3.5 h-3.5" />
             Random Image
@@ -162,7 +168,7 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
             <button
               key={s}
               onClick={() => setStyle(s)}
-              className={`py-2 px-1 rounded-lg text-xs font-bold transition flex flex-col items-center justify-center border ${
+              className={`py-2 px-1 rounded-lg text-xs font-bold transition flex flex-col items-center justify-center border cursor-pointer ${
                 style === s
                   ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
                   : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -186,7 +192,7 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
             <button
               key={ar}
               onClick={() => setAspectRatio(ar)}
-              className={`py-2 px-2 rounded-lg text-xs font-bold transition flex flex-col items-center justify-center border ${
+              className={`py-2 px-2 rounded-lg text-xs font-bold transition flex flex-col items-center justify-center border cursor-pointer ${
                 aspectRatio === ar
                   ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
                   : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -209,7 +215,7 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
           className={`w-full py-2.5 px-4 rounded-xl text-xs font-black tracking-wide uppercase transition flex items-center justify-center gap-2 shadow-sm ${
             isGenerating || !imagePreview
               ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-              : 'bg-slate-900 hover:bg-black text-white'
+              : 'bg-slate-900 hover:bg-black text-white cursor-pointer'
           }`}
         >
           <Sparkles className="w-4 h-4 text-red-500 animate-spin" />
@@ -219,7 +225,7 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
         <button
           onClick={onCreateVariation}
           disabled={isGenerating}
-          className="w-full py-2 px-4 rounded-xl text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition flex items-center justify-center gap-2"
+          className="w-full py-2 px-4 rounded-xl text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition flex items-center justify-center gap-2 cursor-pointer"
         >
           <Wand2 className="w-3.5 h-3.5 text-red-600" />
           Create Variation from Current
@@ -229,7 +235,7 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
       {/* Status Feedback */}
       {statusMessage && (
         <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-[11px] font-bold text-emerald-700 text-center flex items-center justify-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           {statusMessage}
         </div>
       )}

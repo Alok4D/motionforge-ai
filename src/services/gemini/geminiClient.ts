@@ -1,6 +1,6 @@
 import { keyRotator } from './keyRotator';
 import { buildMotionSystemPrompt, buildEditMotionPrompt } from './promptBuilder';
-import { MotionStyle, AspectRatio } from '../../types/motion.types';
+import type { MotionStyle, AspectRatio } from '../../types/motion.types';
 
 export interface GenerationResult {
   success: boolean;
@@ -103,66 +103,86 @@ async function executeGeminiRequestWithRotation(
   if (!activeKeyObj) {
     return {
       success: false,
-      error: 'No active Gemini API Key found in Key Pool. Please upload or add API keys.'
+      error: 'No active Gemini API Key found in Key Pool. Please click "Reset Limits" or add valid API keys.'
     };
   }
 
   const apiKey = activeKeyObj.key;
-  // Models list in order of performance
-  const model = 'gemini-2.5-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  
+  // Valid available Gemini models
+  const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody)
-    });
+  for (const model of candidateModels) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-    if (response.status === 429 || response.status === 403) {
-      console.warn(`Gemini API Key exhausted (Status ${response.status}). Rotating key...`);
-      keyRotator.markKeyExhausted(apiKey);
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
 
-      if (retriesRemaining > 0) {
-        return executeGeminiRequestWithRotation(requestBody, retriesRemaining - 1);
-      } else {
-        return {
-          success: false,
-          error: 'All active Gemini API keys in pool have reached rate limits (429). Please add more keys or reset limits.'
-        };
+      if (response.status === 429) {
+        console.warn(`Gemini API Key rate limited (429). Rotating key...`);
+        keyRotator.markKeyExhausted(apiKey);
+
+        if (retriesRemaining > 0) {
+          return executeGeminiRequestWithRotation(requestBody, retriesRemaining - 1);
+        } else {
+          return {
+            success: false,
+            error: 'All active Gemini API keys have reached quota limit (429). Click "Reset Limits" or add new keys.'
+          };
+        }
       }
-    }
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Gemini API error (${response.status}): ${errText}`);
-    }
+      if (response.status === 404) {
+        // Model not found for this tier, try next model in candidate list
+        console.warn(`Model ${model} returned 404, trying fallback model...`);
+        continue;
+      }
 
-    const data = await response.json();
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const cleanCode = sanitizeGeneratedCode(rawText);
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error(`Gemini API error (${response.status}):`, errText);
+        if (response.status === 400 || response.status === 403) {
+          // If key itself is invalid or expired
+          keyRotator.markKeyExhausted(apiKey);
+          if (retriesRemaining > 0) {
+            return executeGeminiRequestWithRotation(requestBody, retriesRemaining - 1);
+          }
+        }
+        throw new Error(`Gemini API returned status ${response.status}`);
+      }
 
-    return {
-      success: true,
-      code: cleanCode,
-      usedKey: apiKey.substring(0, 8) + '...'
-    };
-  } catch (err: any) {
-    console.error('Gemini call error:', err);
-    if (retriesRemaining > 0) {
-      keyRotator.markKeyExhausted(apiKey);
-      return executeGeminiRequestWithRotation(requestBody, retriesRemaining - 1);
+      const data = await response.json();
+      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const cleanCode = sanitizeGeneratedCode(rawText);
+
+      return {
+        success: true,
+        code: cleanCode,
+        usedKey: apiKey.substring(0, 8) + '...'
+      };
+    } catch (err: any) {
+      console.error(`Gemini call error on model ${model}:`, err);
     }
-    return {
-      success: false,
-      error: err.message || 'Failed to generate motion code.'
-    };
   }
+
+  // If retries remain, try next key in pool
+  if (retriesRemaining > 0) {
+    keyRotator.markKeyExhausted(apiKey);
+    return executeGeminiRequestWithRotation(requestBody, retriesRemaining - 1);
+  }
+
+  return {
+    success: false,
+    error: 'Failed to generate motion code with current API key. Please check your internet connection or verify your API key.'
+  };
 }
 
 function sanitizeGeneratedCode(raw: string): string {
   let cleaned = raw.trim();
-  // Strip ```javascript or ``` wrappers if model included them
   if (cleaned.startsWith('```')) {
     cleaned = cleaned.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
   }

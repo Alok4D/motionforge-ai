@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { StockMetadata } from '../../types/seo.types';
+import type { StockMetadata } from '../../types/seo.types';
 import { exportToStockCsv, powerUpSeoWithAi } from '../../services/seo/seoService';
 import { Sparkles, Copy, Download, Plus, X, Check } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface SeoPanelProps {
   metadata: StockMetadata;
@@ -18,9 +19,10 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
   const [isPoweringUp, setIsPoweringUp] = useState<boolean>(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
-  const copyToClipboard = (text: string, fieldName: string) => {
+  const copyToClipboard = (text: string, fieldName: string, label: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(fieldName);
+    toast.success(`${label} copied to clipboard!`);
     setTimeout(() => setCopiedField(null), 2000);
   };
 
@@ -43,6 +45,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
 
     setMetadata(prev => ({ ...prev, keywords: merged }));
     setCustomTagInput('');
+    toast.success('Keywords added!');
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
@@ -54,11 +57,14 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
 
   const handleAiPowerUp = async () => {
     setIsPoweringUp(true);
+    const loadingToast = toast.loading('AI SEO Expert is analyzing & ranking keywords...');
     try {
       const enhanced = await powerUpSeoWithAi(conceptPrompt || metadata.title);
       setMetadata(enhanced);
+      toast.success('SEO Metadata & Keywords Powered Up!', { id: loadingToast });
     } catch (err) {
       console.error('AI SEO Power-Up failed', err);
+      toast.error('AI Power-Up failed, using local stock algorithm', { id: loadingToast });
     } finally {
       setIsPoweringUp(false);
     }
@@ -66,8 +72,8 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
 
   const handleCopyCsv = () => {
     const csvContent = exportToStockCsv(`motion_hero_${Date.now()}.mov`, metadata);
-    copyToClipboard(csvContent, 'csv');
-    alert('Stock CSV record copied to clipboard! Paste directly into Google Sheets or text file.');
+    navigator.clipboard.writeText(csvContent);
+    toast.success('Stock CSV record copied! (Ready for Adobe Stock / Shutterstock bulk CSV upload)');
   };
 
   return (
@@ -95,8 +101,8 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
             SEO OPTIMIZED TITLE (50–70 CHARACTERS)
           </span>
           <button
-            onClick={() => copyToClipboard(metadata.title, 'title')}
-            className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1"
+            onClick={() => copyToClipboard(metadata.title, 'title', 'SEO Title')}
+            className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1 cursor-pointer"
           >
             {copiedField === 'title' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
             {copiedField === 'title' ? 'Copied!' : 'Copy'}
@@ -117,8 +123,8 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
             ALGORITHMIC DESCRIPTION (CAPTION)
           </span>
           <button
-            onClick={() => copyToClipboard(metadata.description, 'description')}
-            className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1"
+            onClick={() => copyToClipboard(metadata.description, 'description', 'Description')}
+            className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1 cursor-pointer"
           >
             {copiedField === 'description' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
             {copiedField === 'description' ? 'Copied!' : 'Copy'}
@@ -139,8 +145,8 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
             SEARCH KEYWORDS ({metadata.keywords.length} TAGS)
           </span>
           <button
-            onClick={() => copyToClipboard(metadata.keywords.join(', '), 'keywords')}
-            className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1"
+            onClick={() => copyToClipboard(metadata.keywords.join(', '), 'keywords', 'Keywords comma list')}
+            className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1 cursor-pointer"
           >
             {copiedField === 'keywords' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
             {copiedField === 'keywords' ? 'Copied!' : 'Copy Comma List'}
@@ -157,7 +163,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
               <span>{tag}</span>
               <button
                 onClick={() => handleRemoveTag(tag)}
-                className="text-slate-400 hover:text-red-500 p-0.5 rounded"
+                className="text-slate-400 hover:text-red-500 p-0.5 rounded cursor-pointer"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -177,7 +183,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
           />
           <button
             onClick={handleAddCustomTag}
-            className="px-3 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-lg transition flex items-center gap-1"
+            className="px-3 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-lg transition flex items-center gap-1 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             ADD
@@ -189,7 +195,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
       <div className="grid grid-cols-2 gap-3 pt-1">
         <button
           onClick={handleCopyCsv}
-          className="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl border border-slate-300 transition flex items-center justify-center gap-2 shadow-2xs"
+          className="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl border border-slate-300 transition flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
         >
           <Download className="w-4 h-4" />
           Copy Stock CSV Record
@@ -198,7 +204,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
         <button
           onClick={handleAiPowerUp}
           disabled={isPoweringUp}
-          className="py-2.5 px-4 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-xs"
+          className="py-2.5 px-4 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
         >
           <Sparkles className="w-4 h-4 text-amber-400" />
           {isPoweringUp ? 'Powering Up...' : '⚡ AI SEO Power-Up'}

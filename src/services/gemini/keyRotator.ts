@@ -1,4 +1,4 @@
-import { GeminiApiKey, ApiKeyPoolState } from '../../types/apiKey.types';
+import type { GeminiApiKey, ApiKeyPoolState } from '../../types/apiKey.types';
 
 const STORAGE_KEY = 'motion_hero_gemini_keys';
 
@@ -36,26 +36,45 @@ export class KeyRotator {
     }
   }
 
-  public addKeys(rawKeys: string[]): number {
+  public addKeys(rawKeys: string[]): { added: number; reactivated: number; total: number } {
     let addedCount = 0;
-    const existing = new Set(this.state.keys.map(k => k.key.trim()));
+    let reactivatedCount = 0;
+    const existingMap = new Map(this.state.keys.map(k => [k.key.trim(), k]));
 
     rawKeys.forEach(rawKey => {
-      const cleanKey = rawKey.trim();
-      if (cleanKey.length > 20 && !existing.has(cleanKey)) {
-        this.state.keys.push({
-          key: cleanKey,
-          isActive: true,
-          isExhaustedToday: false,
-          requestCount: 0,
-        });
-        existing.add(cleanKey);
-        addedCount++;
+      // Strip any quotes, backticks, brackets or surrounding whitespace
+      const cleanKey = rawKey.replace(/^['"`\[\]\(\)\{\}\s]+|['"`\[\]\(\)\{\}\s]+$/g, '').trim();
+      
+      if (cleanKey.length > 20) {
+        if (existingMap.has(cleanKey)) {
+          // If key already existed, reactivate it (reset any exhausted state)
+          const existingKey = existingMap.get(cleanKey)!;
+          if (existingKey.isExhaustedToday || !existingKey.isActive) {
+            existingKey.isActive = true;
+            existingKey.isExhaustedToday = false;
+            existingKey.exhaustedTimestamp = undefined;
+            reactivatedCount++;
+          }
+        } else {
+          const newKeyObj: GeminiApiKey = {
+            key: cleanKey,
+            isActive: true,
+            isExhaustedToday: false,
+            requestCount: 0,
+          };
+          this.state.keys.push(newKeyObj);
+          existingMap.set(cleanKey, newKeyObj);
+          addedCount++;
+        }
       }
     });
 
     this.saveToStorage();
-    return addedCount;
+    return { 
+      added: addedCount, 
+      reactivated: reactivatedCount, 
+      total: this.state.keys.length 
+    };
   }
 
   public removeKey(keyToRemove: string): void {
@@ -84,7 +103,6 @@ export class KeyRotator {
     const activeKeys = this.state.keys.filter(k => k.isActive && !k.isExhaustedToday);
     if (activeKeys.length === 0) return null;
 
-    // Pick next in rotation
     this.state.currentIndex = (this.state.currentIndex + 1) % activeKeys.length;
     const selected = activeKeys[this.state.currentIndex];
     selected.requestCount = (selected.requestCount || 0) + 1;
