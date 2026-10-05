@@ -6,14 +6,11 @@ import { PromptEditor } from './components/prompt-engine/PromptEditor';
 import { TemplateList } from './components/templates/TemplateList';
 import { ChromaCustomizer } from './components/color-customizer/ChromaCustomizer';
 import { AdvancedCreatorTools } from './components/creator-tools/AdvancedCreatorTools';
-import { SeoPanel } from './components/seo-expert/SeoPanel';
 import { VideoExportPanel } from './components/export/VideoExportPanel';
 
 import { DEFAULT_TEMPLATES } from './constants/defaultPresets';
 import type { AnimationTemplate, MotionStyle, AspectRatio, ColorCustomizerSettings, CreatorToolsSettings } from './types/motion.types';
-import type { StockMetadata } from './types/seo.types';
 import { generateMotionFromImage, editCurrentMotion, generateFromTextPrompt } from './services/gemini/geminiClient';
-import { generateLocalStockMetadata } from './services/seo/seoService';
 import { Toaster, toast } from 'react-hot-toast';
 
 export function App() {
@@ -21,6 +18,7 @@ export function App() {
   const [templates, setTemplates] = useState<AnimationTemplate[]>(DEFAULT_TEMPLATES);
   const [activeTemplate, setActiveTemplate] = useState<AnimationTemplate>(DEFAULT_TEMPLATES[0]);
   const [currentCode, setCurrentCode] = useState<string>(DEFAULT_TEMPLATES[0].code);
+  const [currentTitle, setCurrentTitle] = useState<string>(DEFAULT_TEMPLATES[0].title);
 
   // Input & Generation State
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -47,19 +45,14 @@ export function App() {
     watermarkText: '',
   });
 
-  // SEO Metadata State
-  const [metadata, setMetadata] = useState<StockMetadata>(
-    generateLocalStockMetadata(DEFAULT_TEMPLATES[0].title, DEFAULT_TEMPLATES[0].style)
-  );
-
   // Template select handler
   const handleSelectTemplate = (tmpl: AnimationTemplate) => {
     setActiveTemplate(tmpl);
     setCurrentCode(tmpl.code);
+    setCurrentTitle(tmpl.title);
     setStyle(tmpl.style);
     setAspectRatio(tmpl.aspectRatio);
     setPromptText(tmpl.prompt || tmpl.description);
-    setMetadata(generateLocalStockMetadata(tmpl.title, tmpl.style));
   };
 
   // Generate Motion from Image (AI Vision Call)
@@ -79,7 +72,7 @@ export function App() {
       setCurrentCode(res.code);
       setStatusMessage('✓ Procedural motion graphic synthesized successfully!');
       const newTitle = `Procedural ${style} Motion Matrix`;
-      setMetadata(generateLocalStockMetadata(newTitle, style));
+      setCurrentTitle(newTitle);
       toast.success('Motion graphic synthesized successfully!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 4000);
     } else {
@@ -125,7 +118,7 @@ export function App() {
     if (res.success && res.code) {
       setCurrentCode(res.code);
       setStatusMessage('✓ Motion successfully modified!');
-      setMetadata(generateLocalStockMetadata(promptText, style));
+      setCurrentTitle(promptText.trim());
       toast.success('Motion successfully modified!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
@@ -150,7 +143,7 @@ export function App() {
     if (res.success && res.code) {
       setCurrentCode(res.code);
       setStatusMessage('✓ Generated from prompt successfully!');
-      setMetadata(generateLocalStockMetadata(promptText, style));
+      setCurrentTitle(promptText.trim());
       toast.success('Generated from prompt successfully!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
@@ -263,19 +256,12 @@ export function App() {
             setSettings={setCreatorSettings}
           />
 
-          {/* 5. Microstock SEO Metadata Expert */}
-          <SeoPanel
-            metadata={metadata}
-            setMetadata={setMetadata}
-            conceptPrompt={promptText}
-          />
-
-          {/* 6. Export to Video & Render Queue System */}
+          {/* 5. Export to Video & Render Queue System */}
           <VideoExportPanel
             proceduralCode={currentCode}
             colorSettings={colorSettings}
             creatorSettings={creatorSettings}
-            currentTitle={metadata.title}
+            currentTitle={currentTitle}
           />
         </section>
       </main>
