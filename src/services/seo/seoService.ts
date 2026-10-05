@@ -30,30 +30,21 @@ export function generateLocalStockMetadata(conceptTitle: string, style: string):
 }
 
 export async function powerUpSeoWithAi(conceptDescription: string): Promise<StockMetadata> {
+  const envKey = (import.meta.env.VITE_GEMINI_API_KEY || '').trim();
   const activeKeyObj = keyRotator.getNextActiveKey();
-  if (!activeKeyObj) {
+  const rawKey = envKey || (activeKeyObj ? activeKeyObj.key : '');
+
+  if (!rawKey) {
     return generateLocalStockMetadata(conceptDescription, 'Procedural Canvas');
   }
 
-  const apiKey = activeKeyObj.key;
-  const prompt = `You are a Microstock SEO Expert specializing in Adobe Stock, Shutterstock, and Freepik video contributor guidelines.
-Generate high-ranking metadata for this motion graphic concept:
-"${conceptDescription}"
-
-Format your answer STRICTLY as valid JSON with no markdown wrapping:
-{
-  "title": "Title between 50 to 70 characters including primary keywords",
-  "description": "Algorithmic description explaining aesthetics, colors, framerate, and use cases",
-  "keywords": ["keyword1", "keyword2", ... 40 top relevance single and multi-word tags]
-}`;
-
-  const cleanKey = apiKey.trim();
+  const cleanKey = rawKey.trim();
   const isBearer = cleanKey.startsWith('AQ.') || cleanKey.startsWith('ya29.');
 
   try {
     const url = isBearer
-      ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`
-      : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${cleanKey}`;
+      ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent`
+      : `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${cleanKey}`;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

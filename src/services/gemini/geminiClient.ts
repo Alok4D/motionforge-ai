@@ -115,8 +115,13 @@ async function executeGeminiRequestWithRotation(
     };
   }
 
-  // Primary: gemini-2.0-flash, Fallbacks: gemini-1.5-flash, gemini-2.5-flash
-  const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash'];
+  // Primary: gemini-3.7-flash, Fallbacks: gemini-3.5-flash, gemini-3.1-flash-lite, gemini-flash-lite-latest
+  const candidateModels = [
+    'gemini-3.7-flash',
+    'gemini-3.5-flash',
+    'gemini-3.1-flash-lite',
+    'gemini-flash-lite-latest'
+  ];
   let lastErrorMessage = '';
 
   for (const model of candidateModels) {
@@ -131,8 +136,9 @@ async function executeGeminiRequestWithRotation(
         body: JSON.stringify(requestBody)
       });
 
-      if (response.status === 404) {
-        // Model not available, try next candidate
+      if (response.status === 404 || response.status === 503 || response.status === 429 || response.status === 500) {
+        // High demand, rate limit, or model not found -> instantly try next fallback model
+        console.warn(`Model ${model} returned ${response.status}, trying fallback model...`);
         continue;
       }
 
@@ -172,10 +178,19 @@ async function executeGeminiRequestWithRotation(
   };
 }
 
-function sanitizeGeneratedCode(raw: string): string {
+export function sanitizeGeneratedCode(raw: string): string {
   let cleaned = raw.trim();
-  if (cleaned.startsWith('```')) {
-    cleaned = cleaned.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
+  
+  // Extract code from ```javascript ... ``` or ``` ... ```
+  const codeBlockMatch = cleaned.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
+  if (codeBlockMatch && codeBlockMatch[1]) {
+    cleaned = codeBlockMatch[1].trim();
   }
+
+  // Ensure it has a return statement if it's an anonymous function
+  if (/^function\s*\(/.test(cleaned) || /^\(ctx\s*,/.test(cleaned)) {
+    cleaned = `return ${cleaned};`;
+  }
+
   return cleaned;
 }

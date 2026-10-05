@@ -3,6 +3,7 @@ import type { RenderJob, Resolution, Framerate, VideoFormat, ColorCustomizerSett
 import { renderAnimationToVideo } from '../../services/encoder/videoExporter';
 import { Video, Film, Download, Trash2, CheckCircle2, Play, X, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { compileMotionCode } from '../../utils/motionCompiler';
 
 interface VideoExportPanelProps {
   proceduralCode: string;
@@ -31,8 +32,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
   const handleStartRender = async () => {
     let compiledFunc: Function;
     try {
-      compiledFunc = new Function(proceduralCode.trim())();
-      if (typeof compiledFunc !== 'function') throw new Error('Code must return a render function');
+      compiledFunc = compileMotionCode(proceduralCode);
     } catch (err: any) {
       toast.error('Cannot render: Procedural code contains syntax errors.');
       return;

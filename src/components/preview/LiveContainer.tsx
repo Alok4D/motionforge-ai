@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AspectRatio, ColorCustomizerSettings } from '../../types/motion.types';
 import { Play, Pause, RefreshCw, AlertTriangle } from 'lucide-react';
+import { compileMotionCode } from '../../utils/motionCompiler';
 
 interface LiveContainerProps {
   proceduralCode: string;
@@ -31,12 +32,7 @@ export const LiveContainer: React.FC<LiveContainerProps> = ({
   useEffect(() => {
     setRenderError(null);
     try {
-      // Safe sandbox function constructor
-      const cleaned = proceduralCode.trim();
-      const compiled = new Function(cleaned)();
-      if (typeof compiled !== 'function') {
-        throw new Error('Code must return a rendering function: return function(ctx, width, height, time, colorSettings) { ... }');
-      }
+      const compiled = compileMotionCode(proceduralCode);
       compiledFunctionRef.current = compiled;
     } catch (err: any) {
       console.error('Compilation Error:', err);
