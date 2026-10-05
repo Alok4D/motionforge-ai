@@ -43,8 +43,8 @@ export async function powerUpSeoWithAi(conceptDescription: string): Promise<Stoc
 
   try {
     const url = isBearer
-      ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent`
-      : `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${cleanKey}`;
+      ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent`
+      : `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${cleanKey}`;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -66,7 +66,12 @@ export async function powerUpSeoWithAi(conceptDescription: string): Promise<Stoc
 
     if (response.ok) {
       const data = await response.json();
-      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const parts = data?.candidates?.[0]?.content?.parts || [];
+      const nonThoughtParts = parts.filter((p: any) => !p.thought);
+      const rawText = nonThoughtParts.length > 0 
+        ? nonThoughtParts.map((p: any) => p.text || '').join('\n')
+        : (parts[0]?.text || '');
+
       const cleanJson = rawText.replace(/```json\n?/, '').replace(/```/, '').trim();
       const parsed = JSON.parse(cleanJson);
       return {

@@ -115,12 +115,12 @@ async function executeGeminiRequestWithRotation(
     };
   }
 
-  // Primary: gemini-3.7-flash, Fallbacks: gemini-3.5-flash, gemini-3.1-flash-lite, gemini-flash-lite-latest
+  // Primary: gemini-3.1-flash-lite (fast & robust), Fallbacks: gemini-flash-lite-latest, gemini-3.7-flash, gemini-3.5-flash
   const candidateModels = [
-    'gemini-3.7-flash',
-    'gemini-3.5-flash',
     'gemini-3.1-flash-lite',
-    'gemini-flash-lite-latest'
+    'gemini-flash-lite-latest',
+    'gemini-3.7-flash',
+    'gemini-3.5-flash'
   ];
   let lastErrorMessage = '';
 
@@ -151,7 +151,12 @@ async function executeGeminiRequestWithRotation(
       }
 
       const data = await response.json();
-      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const parts = data?.candidates?.[0]?.content?.parts || [];
+      const nonThoughtParts = parts.filter((p: any) => !p.thought);
+      const rawText = nonThoughtParts.length > 0 
+        ? nonThoughtParts.map((p: any) => p.text || '').join('\n')
+        : (parts[0]?.text || '');
+
       const cleanCode = sanitizeGeneratedCode(rawText);
 
       if (!cleanCode) {
