@@ -23,14 +23,20 @@ export class KeyRotator {
         parsedKeys = JSON.parse(saved);
       }
       
-      // If .env key exists, ensure it is added to pool
-      if (envKey && !parsedKeys.some(k => k.key === envKey)) {
-        parsedKeys.unshift({
-          key: envKey,
-          isActive: true,
-          isExhaustedToday: false,
-          requestCount: 0,
-        });
+      // If .env key exists, ensure it is added to pool and ALWAYS active
+      if (envKey) {
+        const existing = parsedKeys.find(k => k.key === envKey);
+        if (existing) {
+          existing.isActive = true;
+          existing.isExhaustedToday = false;
+        } else {
+          parsedKeys.unshift({
+            key: envKey,
+            isActive: true,
+            isExhaustedToday: false,
+            requestCount: 0,
+          });
+        }
       }
 
       this.state.keys = parsedKeys;
