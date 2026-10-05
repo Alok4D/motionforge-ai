@@ -47,11 +47,26 @@ Format your answer STRICTLY as valid JSON with no markdown wrapping:
   "keywords": ["keyword1", "keyword2", ... 40 top relevance single and multi-word tags]
 }`;
 
+  const cleanKey = apiKey.trim();
+  const isBearer = cleanKey.startsWith('AQ.') || cleanKey.startsWith('ya29.');
+
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const url = isBearer
+      ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`
+      : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${cleanKey}`;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (isBearer) {
+      headers['Authorization'] = `Bearer ${cleanKey}`;
+    } else {
+      headers['x-goog-api-key'] = cleanKey;
+    }
+
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: headers,
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: { temperature: 0.3, maxOutputTokens: 1024 }

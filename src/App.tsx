@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Header } from './components/header/Header';
-import { ApiKeyPool } from './components/key-pool/ApiKeyPool';
 import { VideoImageHub } from './components/ai-hub/VideoImageHub';
 import { LiveContainer } from './components/preview/LiveContainer';
 import { PromptEditor } from './components/prompt-engine/PromptEditor';
@@ -204,11 +203,8 @@ export function App() {
 
       {/* Main Studio Body Grid */}
       <main className="max-w-[1600px] w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
-        {/* Left Sidebar Hub (5 Cols on large screens) */}
+        {/* Left Sidebar Hub (4 Cols on large screens) */}
         <aside className="lg:col-span-4 space-y-5">
-          {/* Gemini API Key Pool */}
-          <ApiKeyPool />
-
           {/* Video & Image AI Hub */}
           <VideoImageHub
             imagePreview={imagePreview}

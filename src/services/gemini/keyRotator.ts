@@ -16,12 +16,25 @@ export class KeyRotator {
 
   public loadFromStorage(): void {
     try {
+      const envKey = (import.meta.env.VITE_GEMINI_API_KEY || '').trim();
       const saved = localStorage.getItem(STORAGE_KEY);
+      let parsedKeys: GeminiApiKey[] = [];
       if (saved) {
-        const parsedKeys: GeminiApiKey[] = JSON.parse(saved);
-        this.state.keys = parsedKeys;
-        this.updateStats();
+        parsedKeys = JSON.parse(saved);
       }
+      
+      // If .env key exists, ensure it is added to pool
+      if (envKey && !parsedKeys.some(k => k.key === envKey)) {
+        parsedKeys.unshift({
+          key: envKey,
+          isActive: true,
+          isExhaustedToday: false,
+          requestCount: 0,
+        });
+      }
+
+      this.state.keys = parsedKeys;
+      this.updateStats();
     } catch (err) {
       console.error('Failed to load keys from storage', err);
     }
