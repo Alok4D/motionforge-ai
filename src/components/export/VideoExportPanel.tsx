@@ -126,30 +126,30 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
   return (
     <div className="motion-card p-5 space-y-5">
       {/* Header */}
-      <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-slate-900 border-b border-slate-100 pb-2.5">
-        <Film className="w-4 h-4 text-red-600" />
+      <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-800 border-b border-slate-100 pb-2.5">
+        <Film className="w-4 h-4 text-indigo-600" />
         Export to Video
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Left Column: Duration & Format */}
-        <div className="space-y-3.5">
+        <div className="space-y-4">
           {/* Duration */}
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-slate-700 uppercase">DURATION (SECONDS)</span>
-              <span className="text-[10px] font-extrabold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200">
+              <span className="text-xs font-bold text-slate-700 uppercase">DURATION (SECONDS)</span>
+              <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
                 Min 5s for Stock
               </span>
             </div>
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-4 gap-2">
               {durationPresets.map(d => (
                 <button
                   key={d}
                   onClick={() => setDuration(d)}
-                  className={`py-1.5 rounded-lg text-xs font-bold transition border cursor-pointer ${
+                  className={`py-2 rounded-md text-xs font-bold transition border cursor-pointer ${
                     duration === d
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
+                      ? 'btn-logo-active shadow-2xs font-bold'
                       : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
@@ -166,16 +166,16 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
                 max={120}
                 value={duration}
                 onChange={(e) => setDuration(Math.max(5, parseInt(e.target.value) || 5))}
-                className="w-20 px-2.5 py-1 text-xs font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-lg focus:outline-hidden focus:border-red-500"
+                className="w-20 px-2.5 py-1 text-xs font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-md focus:outline-hidden focus:border-indigo-500"
               />
               <span className="text-slate-500">seconds</span>
             </div>
           </div>
 
           {/* Format */}
-          <div className="space-y-1.5">
-            <span className="text-[11px] font-bold text-slate-700 uppercase block">FORMAT</span>
-            <div className="grid grid-cols-3 gap-1.5">
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-slate-700 uppercase block">FORMAT</span>
+            <div className="grid grid-cols-3 gap-2">
               {[
                 { id: 'MOV', label: '🎬 MOV (QuickTime)' },
                 { id: 'MP4', label: 'MP4 (H.264)' },
@@ -184,9 +184,9 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
                 <button
                   key={f.id}
                   onClick={() => setFormat(f.id as VideoFormat)}
-                  className={`py-2 px-1 rounded-lg text-xs font-bold transition text-center border cursor-pointer ${
+                  className={`py-2 px-1 rounded-md text-xs font-bold transition text-center border cursor-pointer ${
                     format === f.id
-                      ? 'bg-red-600 text-white border-red-600 shadow-xs'
+                      ? 'btn-logo-active shadow-2xs font-bold'
                       : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
@@ -197,8 +197,8 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
           </div>
 
           {/* Quality Level CRF Slider */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-700">
               <span>QUALITY LEVEL (CRF: {qualityCrf})</span>
               <span className="text-slate-500 font-normal">Lossless Stock Range (15-20)</span>
             </div>
@@ -208,20 +208,20 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
               max={30}
               value={qualityCrf}
               onChange={(e) => setQualityCrf(parseInt(e.target.value))}
-              className="w-full accent-red-600 cursor-pointer"
+              className="w-full accent-indigo-600 cursor-pointer"
             />
           </div>
         </div>
 
         {/* Right Column: Resolution & Framerate */}
-        <div className="space-y-3.5">
+        <div className="space-y-4">
           {/* Resolution */}
-          <div className="space-y-1.5">
-            <span className="text-[11px] font-bold text-slate-700 uppercase block">RESOLUTION</span>
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-slate-700 uppercase block">RESOLUTION</span>
             <select
               value={resolution}
               onChange={(e) => setResolution(e.target.value as Resolution)}
-              className="w-full px-3 py-2 text-xs font-bold text-slate-800 bg-white border border-slate-300 rounded-xl focus:outline-hidden focus:border-red-500 shadow-2xs"
+              className="w-full px-3.5 py-2.5 text-xs font-bold text-slate-800 bg-white border border-slate-300 rounded-md focus:outline-hidden focus:border-indigo-500 shadow-2xs"
             >
               <option value="4K UHD (3840x2160)">4K UHD (3840x2160) - Recommended for Stock</option>
               <option value="1080p FHD (1920x1080)">1080p FHD (1920x1080)</option>
@@ -232,14 +232,14 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
           </div>
 
           {/* Framerate */}
-          <div className="space-y-1.5">
-            <span className="text-[11px] font-bold text-slate-700 uppercase block">FRAMERATE</span>
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-slate-700 uppercase block">FRAMERATE</span>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setFramerate(30)}
-                className={`py-2 px-3 rounded-lg text-xs font-bold transition border cursor-pointer ${
+                className={`py-2 px-3 rounded-md text-xs font-bold transition border cursor-pointer ${
                   framerate === 30
-                    ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
+                    ? 'btn-logo-active shadow-2xs font-bold'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
@@ -247,9 +247,9 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
               </button>
               <button
                 onClick={() => setFramerate(60)}
-                className={`py-2 px-3 rounded-lg text-xs font-bold transition border cursor-pointer ${
+                className={`py-2 px-3 rounded-md text-xs font-bold transition border cursor-pointer ${
                   framerate === 60
-                    ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
+                    ? 'btn-logo-active shadow-2xs font-bold'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
@@ -259,12 +259,12 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
           </div>
 
           {/* Codec Speed */}
-          <div className="space-y-1.5">
-            <span className="text-[11px] font-bold text-slate-700 uppercase block">CODEC SPEED</span>
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-slate-700 uppercase block">CODEC SPEED</span>
             <select
               value={codecSpeed}
               onChange={(e) => setCodecSpeed(e.target.value)}
-              className="w-full px-3 py-2 text-xs font-semibold text-slate-800 bg-white border border-slate-300 rounded-xl focus:outline-hidden focus:border-red-500 shadow-2xs"
+              className="w-full px-3.5 py-2.5 text-xs font-semibold text-slate-800 bg-white border border-slate-300 rounded-md focus:outline-hidden focus:border-indigo-500 shadow-2xs"
             >
               <option value="Medium (Standard)">Medium (Standard)</option>
               <option value="Slow (Better Quality)">Slow (Better Quality)</option>
@@ -277,18 +277,18 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
       {/* Start Render Button */}
       <button
         onClick={handleStartRender}
-        className="w-full py-3 px-6 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-sm uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+        className="w-full py-3.5 px-6 rounded-lg btn-logo-gradient font-bold text-sm uppercase tracking-wider transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
       >
         <Video className="w-4 h-4" />
         Start Render
       </button>
 
       {/* Render Queue Section */}
-      <div className="space-y-3 pt-2 border-t border-slate-100">
+      <div className="space-y-3.5 pt-2 border-t border-slate-100">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-slate-800">
+          <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-800">
             <span>🎦 RENDER QUEUE SYSTEM (SAFE SEQUENTIAL QUEUE)</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+            <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
               {renderQueue.filter(j => j.status === 'RENDERING').length}/1 active
             </span>
           </div>
@@ -296,7 +296,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
           {renderQueue.length > 0 && (
             <button
               onClick={handleClearCompleted}
-              className="text-[11px] font-bold text-slate-500 hover:text-red-600 underline cursor-pointer"
+              className="text-xs font-bold text-slate-500 hover:text-indigo-600 underline cursor-pointer"
             >
               Clear Completed
             </button>
@@ -304,7 +304,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
         </div>
 
         {renderQueue.length === 0 ? (
-          <div className="p-6 text-center text-xs font-medium text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+          <div className="p-6 text-center text-xs font-medium text-slate-400 bg-slate-50 rounded-lg border border-dashed border-slate-200">
             No renders in queue. Click <strong>Start Render</strong> to start.
           </div>
         ) : (
@@ -312,22 +312,22 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
             {renderQueue.map(job => (
               <div
                 key={job.id}
-                className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-3 shadow-2xs"
+                className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg space-y-3 shadow-2xs"
               >
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     {job.status === 'COMPLETED' ? (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      <span className="px-2 py-0.5 rounded-md text-xs font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                         COMPLETED
                       </span>
                     ) : job.status === 'RENDERING' ? (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1">
-                        <Loader2 className="w-3 h-3 animate-spin text-amber-600" />
+                      <span className="px-2 py-0.5 rounded-md text-xs font-bold uppercase bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-600" />
                         RENDERING ({job.progress}%)
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-red-100 text-red-800 border border-red-300">
+                      <span className="px-2 py-0.5 rounded-md text-xs font-bold uppercase bg-rose-100 text-rose-800 border border-rose-300">
                         FAILED
                       </span>
                     )}
@@ -336,7 +336,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
                       {job.id}
                     </span>
 
-                    <span className="text-[10px] font-mono text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                    <span className="text-xs font-mono text-slate-600 bg-white px-2 py-0.5 rounded-md border border-slate-200">
                       {job.resolution}
                     </span>
                   </div>
@@ -346,14 +346,14 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
                       <>
                         <button
                           onClick={() => setPreviewJob(job)}
-                          className="px-2.5 py-1 text-xs font-bold text-slate-800 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 transition flex items-center gap-1 shadow-2xs cursor-pointer"
+                          className="px-3 py-1.5 text-xs font-bold text-slate-800 bg-white hover:bg-slate-100 rounded-md border border-slate-300 transition flex items-center gap-1.5 shadow-2xs cursor-pointer"
                         >
-                          <Play className="w-3 h-3 text-red-600" />
+                          <Play className="w-3.5 h-3.5 text-indigo-600" />
                           Preview Video
                         </button>
                         <button
                           onClick={() => handleDownload(job)}
-                          className="px-3 py-1 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition flex items-center gap-1 shadow-xs cursor-pointer"
+                          className="px-3.5 py-1.5 text-xs font-bold text-white btn-logo-gradient rounded-md transition flex items-center gap-1.5 shadow-xs cursor-pointer"
                         >
                           <Download className="w-3.5 h-3.5" />
                           Download ({job.fileSizeMb || 34.5} MB)
@@ -362,23 +362,23 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
                     )}
                     <button
                       onClick={() => handleDeleteJob(job.id)}
-                      className="p-1 text-slate-400 hover:text-red-600 cursor-pointer"
+                      className="p-1 text-slate-400 hover:text-rose-600 cursor-pointer"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
                 {/* Progress Bar for Rendering */}
                 {job.status === 'RENDERING' && (
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                       <div
-                        className="bg-red-600 h-full transition-all duration-150"
+                        className="btn-logo-gradient h-full transition-all duration-150"
                         style={{ width: `${job.progress}%` }}
                       />
                     </div>
-                    <div className="flex justify-between text-[10px] font-mono text-slate-500">
+                    <div className="flex justify-between text-xs font-mono text-slate-500">
                       <span>Encoding frame: {job.currentFrame} / {job.totalFrames}</span>
                       <span>{job.progress}%</span>
                     </div>
@@ -393,12 +393,12 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
       {/* Video Preview Modal */}
       {previewJob && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full p-4 space-y-3 shadow-2xl animate-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl max-w-3xl w-full p-4 space-y-3 shadow-2xl animate-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
               <div className="flex items-center gap-2">
-                <Film className="w-4 h-4 text-red-500" />
+                <Film className="w-4 h-4 text-cyan-400" />
                 <h3 className="text-xs font-bold text-white font-mono">{previewJob.id}</h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-950 text-emerald-400 border border-emerald-800">
                   {previewJob.resolution}
                 </span>
               </div>
@@ -410,7 +410,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
               </button>
             </div>
 
-            <div className="aspect-video bg-black rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
+            <div className="aspect-video bg-black rounded-lg overflow-hidden border border-slate-800 flex items-center justify-center">
               {previewJob.videoBlobUrl && (
                 <video
                   src={previewJob.videoBlobUrl}
@@ -429,13 +429,13 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPreviewJob(null)}
-                  className="px-4 py-1.5 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 rounded-lg cursor-pointer"
+                  className="px-4 py-2 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 rounded-md cursor-pointer"
                 >
                   Close Preview
                 </button>
                 <button
                   onClick={() => handleDownload(previewJob)}
-                  className="px-4 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  className="px-4 py-2 text-xs font-bold text-white btn-logo-gradient rounded-md flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />
                   Download Video

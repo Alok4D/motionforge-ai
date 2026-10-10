@@ -117,20 +117,20 @@ export const LiveContainer: React.FC<LiveContainerProps> = ({
       <div className="px-4 py-2.5 bg-white border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="text-xs font-black tracking-wider uppercase text-slate-900">
+          <span className="text-sm font-bold tracking-wider uppercase text-slate-800">
             Live Container Preview
           </span>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Aspect Ratio Switcher */}
-          <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px] font-bold">
+          <div className="flex items-center bg-slate-100 p-1 rounded-md border border-slate-200 text-xs font-bold">
             {(['16:9', '9:16', '1:1'] as AspectRatio[]).map(ar => (
               <button
                 key={ar}
                 onClick={() => setAspectRatio(ar)}
-                className={`px-2 py-0.5 rounded-md transition ${
-                  aspectRatio === ar ? 'bg-slate-900 text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                className={`px-2.5 py-1 rounded-md transition cursor-pointer ${
+                  aspectRatio === ar ? 'btn-logo-active shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {ar}
@@ -140,25 +140,25 @@ export const LiveContainer: React.FC<LiveContainerProps> = ({
 
           {/* Color Presets */}
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-            <span className="text-[10px] uppercase text-slate-400">Color:</span>
+            <span className="text-xs uppercase text-slate-400 font-semibold">Color:</span>
             <button
               onClick={() => setColorSettings(prev => ({ ...prev, elementColor: '#00f0ff', isGreenScreen: false }))}
-              className="w-3.5 h-3.5 rounded-full bg-cyan-400 border border-slate-300 shadow-2xs hover:scale-110 transition"
+              className="w-4 h-4 rounded-full bg-cyan-400 border border-slate-300 shadow-2xs hover:scale-110 transition cursor-pointer"
               title="Cyan"
             />
             <button
               onClick={() => setColorSettings(prev => ({ ...prev, elementColor: '#10b981', isGreenScreen: false }))}
-              className="w-3.5 h-3.5 rounded-full bg-emerald-500 border border-slate-300 shadow-2xs hover:scale-110 transition"
+              className="w-4 h-4 rounded-full bg-emerald-500 border border-slate-300 shadow-2xs hover:scale-110 transition cursor-pointer"
               title="Emerald"
             />
             <button
               onClick={() => setColorSettings(prev => ({ ...prev, elementColor: '#a855f7', isGreenScreen: false }))}
-              className="w-3.5 h-3.5 rounded-full bg-purple-500 border border-slate-300 shadow-2xs hover:scale-110 transition"
+              className="w-4 h-4 rounded-full bg-purple-500 border border-slate-300 shadow-2xs hover:scale-110 transition cursor-pointer"
               title="Purple"
             />
             <button
               onClick={() => setColorSettings(prev => ({ ...prev, elementColor: '#ff0055', isGreenScreen: false }))}
-              className="w-3.5 h-3.5 rounded-full bg-rose-500 border border-slate-300 shadow-2xs hover:scale-110 transition"
+              className="w-4 h-4 rounded-full bg-rose-500 border border-slate-300 shadow-2xs hover:scale-110 transition cursor-pointer"
               title="Rose"
             />
           </div>
@@ -166,7 +166,7 @@ export const LiveContainer: React.FC<LiveContainerProps> = ({
           {/* Green Screen Button */}
           <button
             onClick={handleToggleGreenScreen}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition border ${
+            className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition border cursor-pointer ${
               colorSettings.isGreenScreen
                 ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
                 : 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'

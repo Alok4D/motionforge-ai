@@ -44,22 +44,26 @@ export const TemplateList: React.FC<TemplateListProps> = ({
   };
 
   return (
-    <div className="motion-card p-4 space-y-3">
+    <div className="motion-card p-4 space-y-3.5">
       {/* Top Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-        <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-800">
-          <Layers className="w-4 h-4 text-red-600" />
+      <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+        <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-800">
+          <Layers className="w-4 h-4 text-indigo-600" />
           Animation Templates
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="grid grid-cols-4 gap-1 bg-slate-100 p-1 rounded-lg text-[10px] font-extrabold text-slate-600 text-center">
+      <div className="grid grid-cols-4 gap-1.5 bg-slate-100 p-1 rounded-md text-xs font-bold text-slate-600 text-center">
         {(['ALL', 'CANVAS', 'CSS', 'SVG'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={activeTab === tab ? "py-1 rounded-md transition cursor-pointer bg-slate-900 text-white shadow-2xs" : "py-1 rounded-md transition cursor-pointer hover:text-slate-900 hover:bg-slate-200/60"}
+            className={`py-1.5 rounded-md transition cursor-pointer text-xs font-bold ${
+              activeTab === tab
+                ? 'btn-logo-gradient shadow-2xs'
+                : 'hover:text-slate-900 hover:bg-slate-200/70'
+            }`}
           >
             {tab}
           </button>
@@ -67,24 +71,28 @@ export const TemplateList: React.FC<TemplateListProps> = ({
       </div>
 
       {/* Templates List */}
-      <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+      <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
         {filtered.map((tmpl) => (
           <div
             key={tmpl.id}
             onClick={() => onSelectTemplate(tmpl)}
-            className={activeTemplateId === tmpl.id ? "p-2.5 rounded-xl border cursor-pointer transition relative group bg-red-50/50 border-red-400 shadow-2xs" : "p-2.5 rounded-xl border cursor-pointer transition relative group bg-white border-slate-200 hover:border-slate-300"}
+            className={`p-3 rounded-lg border cursor-pointer transition relative group ${
+              activeTemplateId === tmpl.id
+                ? 'bg-gradient-to-r from-cyan-50/60 to-indigo-50/60 border-indigo-400 shadow-2xs ring-1 ring-indigo-400/30'
+                : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/40'
+            }`}
           >
             <div className="flex items-start justify-between gap-2">
-              <div className="space-y-0.5 flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className={activeTemplateId === tmpl.id ? "w-2 h-2 rounded-full bg-red-500" : "w-2 h-2 rounded-full bg-slate-300"} />
+              <div className="space-y-1 flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${activeTemplateId === tmpl.id ? 'bg-indigo-600 animate-pulse' : 'bg-slate-300'}`} />
                   <h4 className="text-xs font-bold text-slate-800 truncate m-0">{tmpl.title}</h4>
                 </div>
-                <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed m-0">
+                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed m-0">
                   {tmpl.description}
                 </p>
               </div>
-              <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 uppercase border border-slate-200">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 uppercase border border-slate-200">
                 {tmpl.type}
               </span>
             </div>
@@ -92,10 +100,10 @@ export const TemplateList: React.FC<TemplateListProps> = ({
             {tmpl.type === 'PRESET' && onDeletePreset && (
               <button
                 onClick={(e) => { e.stopPropagation(); onDeletePreset(tmpl.id); }}
-                className="absolute top-2 right-2 text-slate-400 hover:text-red-600 p-1 bg-white rounded shadow-xs cursor-pointer"
+                className="absolute top-2 right-2 text-slate-400 hover:text-rose-600 p-1 bg-white rounded-md shadow-2xs cursor-pointer"
                 title="Delete preset"
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
@@ -106,16 +114,16 @@ export const TemplateList: React.FC<TemplateListProps> = ({
       <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100">
         <button
           onClick={handleCopySource}
-          className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition flex items-center justify-center gap-1.5 cursor-pointer"
+          className="py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-md border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
         >
-          <Copy className="w-3.5 h-3.5" />
+          <Copy className="w-4 h-4 text-cyan-500" />
           Copy Source
         </button>
         <button
           onClick={handleDownloadHtml}
-          className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition flex items-center justify-center gap-1.5 cursor-pointer"
+          className="py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-md border border-slate-200 hover:border-purple-300 hover:text-purple-600 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
         >
-          <Download className="w-3.5 h-3.5" />
+          <Download className="w-4 h-4 text-purple-500" />
           Download .html
         </button>
       </div>

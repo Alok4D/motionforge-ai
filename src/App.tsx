@@ -244,8 +244,8 @@ export function App() {
       </main>
 
       {/* Footer Bar */}
-      <footer className="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500 font-medium">
-        MotionForge AI Studio â€¢ In-Browser 4K 60FPS Microstock Procedural Motion Graphics Engine
+      <footer className="bg-white border-t border-slate-200 py-3.5 text-center text-xs text-slate-500 font-medium">
+        MotionForge AI Studio • In-Browser 4K 60FPS Microstock Procedural Motion Graphics Engine
       </footer>
     </div>
   );

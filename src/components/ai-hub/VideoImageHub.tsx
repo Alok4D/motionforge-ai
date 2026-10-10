@@ -428,49 +428,49 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
   return (
     <div className="motion-card p-4 space-y-4">
       {/* Title */}
-      <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-slate-800 border-b border-slate-100 pb-2">
-        <Sparkles className="w-4 h-4 text-red-500" />
+      <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-800 border-b border-slate-100 pb-2.5">
+        <Sparkles className="w-4 h-4 text-cyan-500" />
         Video & Image AI Hub
       </div>
 
       {/* Upload Zone / Dropzone */}
       <div 
-        className="space-y-2"
+        className="space-y-2.5"
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
         {imagePreview ? (
-          <div className={`relative border-2 rounded-xl overflow-hidden bg-slate-900 group transition-all duration-200 ${
-            isDragging ? 'border-red-500 ring-4 ring-red-500/20 scale-[0.99]' : 'border-slate-200'
+          <div className={`relative border-2 rounded-lg overflow-hidden bg-slate-900 group transition-all duration-200 ${
+            isDragging ? 'border-cyan-500 ring-4 ring-cyan-500/20 scale-[0.99]' : 'border-slate-200'
           }`}>
             <img 
               src={imagePreview} 
               alt="Uploaded Preview" 
-              className="w-full h-36 object-contain"
+              className="w-full h-40 object-contain"
             />
             {isDragging && (
               <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-xs flex flex-col items-center justify-center text-white z-10 transition">
-                <Upload className="w-8 h-8 text-red-500 animate-bounce mb-1" />
-                <span className="text-xs font-black uppercase tracking-wider text-red-400">
+                <Upload className="w-8 h-8 text-cyan-400 animate-bounce mb-1" />
+                <span className="text-xs font-bold uppercase tracking-wider text-cyan-300">
                   Drop new image to replace
                 </span>
               </div>
             )}
-            <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-xs p-1 rounded-lg border border-slate-700">
+            <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-xs p-1 rounded-md border border-slate-700">
               <button
                 onClick={handlePasteClipboard}
                 title="Paste / Replace"
-                className="px-2 py-1 text-[11px] font-bold text-slate-300 hover:text-white flex items-center gap-1 cursor-pointer"
+                className="px-2.5 py-1 text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 cursor-pointer"
               >
-                <Copy className="w-3 h-3" />
+                <Copy className="w-3.5 h-3.5" />
                 Replace
               </button>
               <button
                 onClick={() => { setImagePreview(null); toast('Image removed', { icon: '🗑️' }); }}
                 title="Remove Image"
-                className="p-1 text-slate-400 hover:text-red-400 cursor-pointer"
+                className="p-1 text-slate-400 hover:text-rose-400 cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -479,22 +479,22 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
         ) : (
           <div
             onClick={() => fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 ${
+            className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-200 ${
               isDragging
-                ? 'border-red-500 bg-red-50/60 ring-4 ring-red-500/20 scale-[1.01]'
-                : 'border-slate-300 hover:border-red-400 bg-slate-50/50 hover:bg-slate-50'
+                ? 'border-cyan-500 bg-cyan-50/60 ring-4 ring-cyan-500/20 scale-[1.01]'
+                : 'border-slate-300 hover:border-indigo-400 bg-slate-50/50 hover:bg-slate-50'
             }`}
           >
-            <div className={`w-10 h-10 rounded-full bg-white shadow-xs border flex items-center justify-center transition ${
-              isDragging ? 'border-red-400 text-red-500 animate-bounce' : 'border-slate-200 text-slate-500'
+            <div className={`w-11 h-11 rounded-lg bg-white shadow-2xs border flex items-center justify-center transition ${
+              isDragging ? 'border-cyan-400 text-cyan-500 animate-bounce' : 'border-slate-200 text-slate-600'
             }`}>
-              <Upload className="w-5 h-5" />
+              <Upload className="w-5 h-5 text-indigo-600" />
             </div>
             <div className="text-center">
-              <p className="text-xs font-bold text-slate-700 m-0">
+              <p className="text-sm font-bold text-slate-700 m-0">
                 {isDragging ? 'Drop your image now!' : 'Drag & drop image or browse'}
               </p>
-              <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+              <p className="text-xs text-slate-500 font-medium mt-1">
                 Drop files, drag from web, or press Ctrl+V to paste
               </p>
             </div>
@@ -513,64 +513,64 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={handlePasteClipboard}
-            className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition flex items-center justify-center gap-1 cursor-pointer"
+            className="py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-md border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
           >
-            <ImageIcon className="w-3.5 h-3.5 text-red-600" />
+            <ImageIcon className="w-4 h-4 text-cyan-500" />
             Paste Image
           </button>
           <button
             onClick={handleRandomImage}
-            className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition flex items-center justify-center gap-1 cursor-pointer"
+            className="py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-md border border-slate-200 hover:border-purple-300 hover:text-purple-600 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
           >
-            <Wand2 className="w-3.5 h-3.5 text-slate-600" />
+            <Wand2 className="w-4 h-4 text-purple-500" />
             Random Image
           </button>
         </div>
       </div>
 
       {/* Motion Style & Dimension */}
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs font-bold text-slate-700">
           <span>MOTION STYLE & DIMENSION</span>
-          <span className="text-red-600 font-extrabold">{style}</span>
+          <span className="text-indigo-600 font-extrabold">{style}</span>
         </div>
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-3 gap-2">
           {(['3D Cinematic', '2D Vector', 'Line Art'] as MotionStyle[]).map((s, idx) => (
             <button
               key={s}
               onClick={() => setStyle(s)}
-              className={`py-2 px-1 rounded-lg text-xs font-bold transition flex flex-col items-center justify-center border cursor-pointer ${
+              className={`py-2 px-1 rounded-md text-xs font-bold transition flex flex-col items-center justify-center border cursor-pointer ${
                 style === s
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  ? 'btn-logo-active border-transparent'
+                  : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
               }`}
             >
-              <span className="text-[10px] opacity-75">{idx + 1}. {s.split(' ')[0]}</span>
-              <span className="text-[11px] truncate">{s.split(' ').slice(1).join(' ') || s}</span>
+              <span className={`text-[11px] ${style === s ? 'text-white/80' : 'text-slate-400'}`}>{idx + 1}. {s.split(' ')[0]}</span>
+              <span className="text-xs truncate">{s.split(' ').slice(1).join(' ') || s}</span>
             </button>
           ))}
         </div>
       </div>
 
       {/* Canvas Aspect Ratio */}
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs font-bold text-slate-700">
           <span>CANVAS ASPECT RATIO</span>
-          <span className="text-slate-500 font-mono">{aspectRatio === '16:9' ? '16:9 Widescreen' : aspectRatio}</span>
+          <span className="text-slate-500 font-mono text-xs">{aspectRatio === '16:9' ? '16:9 Widescreen' : aspectRatio}</span>
         </div>
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-3 gap-2">
           {(['16:9', '9:16', '1:1'] as AspectRatio[]).map(ar => (
             <button
               key={ar}
               onClick={() => setAspectRatio(ar)}
-              className={`py-2 px-2 rounded-lg text-xs font-bold transition flex flex-col items-center justify-center border cursor-pointer ${
+              className={`py-2 px-2 rounded-md text-xs font-bold transition flex flex-col items-center justify-center border cursor-pointer ${
                 aspectRatio === ar
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  ? 'btn-logo-active border-transparent'
+                  : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
               }`}
             >
-              <span>{ar}</span>
-              <span className="text-[9px] opacity-75 font-normal">
+              <span className="text-xs">{ar}</span>
+              <span className={`text-[11px] font-normal ${aspectRatio === ar ? 'text-white/80' : 'text-slate-500'}`}>
                 {ar === '16:9' ? 'Landscape' : ar === '9:16' ? 'Vertical' : 'Square'}
               </span>
             </button>
@@ -579,33 +579,33 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
       </div>
 
       {/* Main Action Buttons */}
-      <div className="space-y-2 pt-1">
+      <div className="space-y-2.5 pt-1">
         <button
           onClick={onGenerateFromImage}
           disabled={isGenerating || !imagePreview}
-          className={`w-full py-2.5 px-4 rounded-xl text-xs font-black tracking-wide uppercase transition flex items-center justify-center gap-2 shadow-sm ${
+          className={`w-full py-3 px-4 rounded-lg text-sm font-bold tracking-wide uppercase transition flex items-center justify-center gap-2 cursor-pointer ${
             isGenerating || !imagePreview
-              ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-              : 'bg-slate-900 hover:bg-black text-white cursor-pointer'
+              ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+              : 'btn-logo-gradient'
           }`}
         >
-          <Sparkles className="w-4 h-4 text-red-500 animate-spin" />
+          <Sparkles className="w-4 h-4 text-white animate-spin" />
           {isGenerating ? 'Generating Motion...' : 'Generate Motion from Image'}
         </button>
 
         <button
           onClick={onCreateVariation}
           disabled={isGenerating}
-          className="w-full py-2 px-4 rounded-xl text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-2.5 px-4 rounded-lg text-xs font-bold text-white btn-logo-secondary transition flex items-center justify-center gap-2 cursor-pointer"
         >
-          <Wand2 className="w-3.5 h-3.5 text-red-600" />
+          <Wand2 className="w-4 h-4 text-cyan-200" />
           Create Variation from Current
         </button>
       </div>
 
       {/* Status Feedback */}
       {statusMessage && (
-        <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-[11px] font-bold text-emerald-700 text-center flex items-center justify-center gap-1.5">
+        <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-md text-xs font-bold text-emerald-700 text-center flex items-center justify-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           {statusMessage}
         </div>
