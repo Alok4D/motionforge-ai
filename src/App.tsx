@@ -152,27 +152,6 @@ export function App() {
     }
   };
 
-  // Save Custom Preset
-  const handleSavePreset = (name: string) => {
-    const newPreset: AnimationTemplate = {
-      id: `custom-preset-${Date.now()}`,
-      title: name,
-      description: promptText || 'Custom procedural animation preset',
-      type: 'PRESET',
-      code: currentCode,
-      style: style,
-      aspectRatio: aspectRatio,
-      prompt: promptText,
-    };
-    setTemplates(prev => [newPreset, ...prev]);
-    toast.success(`Preset "${name}" saved to library!`);
-  };
-
-  const handleDeletePreset = (id: string) => {
-    setTemplates(prev => prev.filter(t => t.id !== id));
-    toast('Preset deleted', { icon: 'ðŸ—‘ï¸' });
-  };
-
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans">
       {/* Toast notifications container */}
@@ -216,9 +195,7 @@ export function App() {
           <TemplateList
             templates={templates}
             activeTemplateId={activeTemplate.id}
-            onSelectTemplate={handleSelectTemplate}
-            onSavePreset={handleSavePreset}
-            onDeletePreset={handleDeletePreset}
+            onSelectTemplate={handleSelectTemplate}
             currentCode={currentCode}
           />
         </aside>
