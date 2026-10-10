@@ -56,22 +56,22 @@ export function App() {
   };
 
   // Generate Motion from Image (AI Vision Call)
-  const handleGenerateFromImage = async () => {
+  const handleGenerateFromImage = async (motionPrompt?: string) => {
     if (!imagePreview) {
       toast.error('Please upload or paste an image first');
       return;
     }
     setIsProcessing(true);
-    setStatusMessage('Analyzing image & synthesizing procedural code with Gemini AI...');
-    const loadingToast = toast.loading('Gemini AI is analyzing visual geometry & generating 60FPS motion code...');
+    setStatusMessage('Analyzing image geometry & extracting colors with Gemini AI...');
+    const loadingToast = toast.loading('Gemini AI is analyzing image contours, colors & generating 60FPS motion code...');
 
-    const res = await generateMotionFromImage(imagePreview, style, aspectRatio);
+    const res = await generateMotionFromImage(imagePreview, style, aspectRatio, motionPrompt);
     setIsProcessing(false);
 
     if (res.success && res.code) {
       setCurrentCode(res.code);
-      setStatusMessage('âœ“ Procedural motion graphic synthesized successfully!');
-      const newTitle = `Procedural ${style} Motion Matrix`;
+      setStatusMessage('✓ Procedural motion graphic synthesized successfully!');
+      const newTitle = motionPrompt?.trim() || `Procedural ${style} Motion Matrix`;
       setCurrentTitle(newTitle);
       toast.success('Motion graphic synthesized successfully!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 4000);

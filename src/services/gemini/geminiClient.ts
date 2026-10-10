@@ -1,5 +1,5 @@
 import { keyRotator } from './keyRotator';
-import { buildMotionSystemPrompt, buildEditMotionPrompt } from './promptBuilder';
+import { buildMotionSystemPrompt, buildImageMotionUserPrompt, buildEditMotionPrompt } from './promptBuilder';
 import type { MotionStyle, AspectRatio } from '../../types/motion.types';
 
 export interface GenerationResult {
@@ -14,10 +14,11 @@ export async function generateMotionFromImage(
   imageBase64: string,
   style: MotionStyle,
   aspectRatio: AspectRatio,
+  userMotionPrompt?: string,
   maxRetries = 3
 ): Promise<GenerationResult> {
   const systemPrompt = buildMotionSystemPrompt(style, aspectRatio);
-  const userPrompt = `Analyze this image in detail. Extract its visual geometry, focal elements, glow colors, and theme. Generate a high-end 60FPS procedural canvas animation code recreating this concept in ${style} style for microstock video platforms.`;
+  const userPrompt = buildImageMotionUserPrompt(style, userMotionPrompt);
 
   // Clean base64
   const cleanBase64 = imageBase64.includes('base64,') 

@@ -11,7 +11,7 @@ interface VideoImageHubProps {
   aspectRatio: AspectRatio;
   setAspectRatio: (ar: AspectRatio) => void;
   isGenerating: boolean;
-  onGenerateFromImage: () => void;
+  onGenerateFromImage: (motionPrompt?: string) => void;
   onCreateVariation: () => void;
   statusMessage?: string | null;
 }
@@ -106,6 +106,7 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [motionPrompt, setMotionPrompt] = useState<string>('');
   const dragCounter = useRef<number>(0);
 
   // Common processor for files, blobs, URLs, or HTML
@@ -578,10 +579,50 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
         </div>
       </div>
 
+      {/* AI Motion Direction Prompt Input */}
+      <div className="space-y-1.5 pt-1 border-t border-slate-100">
+        <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+          <span className="flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-500" />
+            AI MOTION DIRECTION (OPTIONAL)
+          </span>
+          <span className="text-[11px] text-slate-400 font-normal">Guide what to animate</span>
+        </div>
+        <textarea
+          rows={2}
+          value={motionPrompt}
+          onChange={(e) => setMotionPrompt(e.target.value)}
+          placeholder="Describe animation (e.g. Animate the emblem with glowing neon waves, speed dashes to the right, and 3D floating)..."
+          className="w-full px-3 py-2 text-xs text-slate-800 bg-slate-50/70 border border-slate-300 rounded-md focus:outline-hidden focus:border-indigo-500 focus:bg-white resize-none font-medium leading-relaxed shadow-2xs transition"
+        />
+        {/* Suggestion tags */}
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            '+ Animate Object Contours',
+            '+ Shooting Speed Trails',
+            '+ Glowing Energy Pulse',
+            '+ 3D Perspective Tilt',
+            '+ Particle Spark Aura'
+          ].map(tag => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => {
+                const clean = tag.replace(/^\+\s*/, '');
+                setMotionPrompt(prev => prev ? `${prev}, ${clean}` : clean);
+              }}
+              className="px-2 py-0.5 text-[10px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 rounded-md hover:border-indigo-300 hover:text-indigo-600 transition shadow-2xs cursor-pointer"
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Main Action Buttons */}
       <div className="space-y-2.5 pt-1">
         <button
-          onClick={onGenerateFromImage}
+          onClick={() => onGenerateFromImage(motionPrompt)}
           disabled={isGenerating || !imagePreview}
           className={`w-full py-3 px-4 rounded-lg text-sm font-bold tracking-wide uppercase transition flex items-center justify-center gap-2 cursor-pointer ${
             isGenerating || !imagePreview
@@ -589,7 +630,7 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
               : 'btn-logo-gradient'
           }`}
         >
-       
+          <Sparkles className="w-4 h-4 text-white" />
           {isGenerating ? 'Generating Motion...' : 'Generate Motion from Image'}
         </button>
 
@@ -598,6 +639,7 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
           disabled={isGenerating}
           className="w-full py-2.5 px-4 rounded-lg text-xs font-bold text-white btn-logo-secondary transition flex items-center justify-center gap-2 cursor-pointer"
         >
+          <Wand2 className="w-4 h-4 text-cyan-200" />
           Create Variation from Current
         </button>
       </div>
