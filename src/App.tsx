@@ -70,7 +70,7 @@ export function App() {
 
     if (res.success && res.code) {
       setCurrentCode(res.code);
-      setStatusMessage('✓ Procedural motion graphic synthesized successfully!');
+      setStatusMessage('âœ“ Procedural motion graphic synthesized successfully!');
       const newTitle = `Procedural ${style} Motion Matrix`;
       setCurrentTitle(newTitle);
       toast.success('Motion graphic synthesized successfully!', { id: loadingToast });
@@ -93,7 +93,7 @@ export function App() {
 
     if (res.success && res.code) {
       setCurrentCode(res.code);
-      setStatusMessage('✓ Variation synthesized successfully!');
+      setStatusMessage('âœ“ Variation synthesized successfully!');
       toast.success('Variation synthesized successfully!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
@@ -117,7 +117,7 @@ export function App() {
 
     if (res.success && res.code) {
       setCurrentCode(res.code);
-      setStatusMessage('✓ Motion successfully modified!');
+      setStatusMessage('âœ“ Motion successfully modified!');
       setCurrentTitle(promptText.trim());
       toast.success('Motion successfully modified!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 3000);
@@ -142,7 +142,7 @@ export function App() {
 
     if (res.success && res.code) {
       setCurrentCode(res.code);
-      setStatusMessage('✓ Generated from prompt successfully!');
+      setStatusMessage('âœ“ Generated from prompt successfully!');
       setCurrentTitle(promptText.trim());
       toast.success('Generated from prompt successfully!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 3000);
@@ -170,7 +170,7 @@ export function App() {
 
   const handleDeletePreset = (id: string) => {
     setTemplates(prev => prev.filter(t => t.id !== id));
-    toast('Preset deleted', { icon: '🗑️' });
+    toast('Preset deleted', { icon: 'ðŸ—‘ï¸' });
   };
 
   return (
@@ -268,7 +268,7 @@ export function App() {
 
       {/* Footer Bar */}
       <footer className="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500 font-medium">
-        Motion Hero PRO Studio • In-Browser 4K 60FPS Microstock Procedural Motion Graphics Engine
+        MotionForge AI Studio â€¢ In-Browser 4K 60FPS Microstock Procedural Motion Graphics Engine
       </footer>
     </div>
   );

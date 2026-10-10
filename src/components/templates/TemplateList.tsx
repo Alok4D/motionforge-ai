@@ -57,7 +57,7 @@ export const TemplateList: React.FC<TemplateListProps> = ({
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Motion Hero 4K Animation</title>
+  <title>MotionForge AI 4K Animation</title>
   <style>
     body { margin: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100vh; }
     canvas { width: 100vw; height: 100vh; object-fit: contain; }

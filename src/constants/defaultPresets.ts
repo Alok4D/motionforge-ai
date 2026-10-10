@@ -2,15 +2,15 @@ import { AnimationTemplate } from '../types/motion.types';
 
 export const DEFAULT_TEMPLATES: AnimationTemplate[] = [
   {
-    id: 'motion-hero-brand-loop',
-    title: 'Motion Hero: Official 4K Kinetic Brand Loop',
-    description: 'Official Motion Hero brand emblem with 3D cyber grid, glowing squircle laser scanner, quantum energy rings, and cinematic particle stream.',
+    id: 'motionforge-ai-brand-loop',
+    title: 'MotionForge AI: Official 4K Kinetic Brand Loop',
+    description: 'Official MotionForge AI brand emblem with 3D cyber grid, glowing squircle laser scanner, quantum energy rings, and cinematic particle stream.',
     type: 'CANVAS',
     style: '3D Cinematic',
     aspectRatio: '16:9',
-    prompt: 'Official Motion Hero brand emblem with 3D cyber grid, glowing squircle laser scanner, quantum energy rings, and cinematic particle stream.',
+    prompt: 'Official MotionForge AI brand emblem with 3D cyber grid, glowing squircle laser scanner, quantum energy rings, and cinematic particle stream.',
     tags: ['brand', 'quantum', 'rings', 'particles', '3d'],
-    code: `// Motion Hero Official 4K Kinetic Brand Loop (Procedural Canvas)
+    code: `// MotionForge AI Official 4K Kinetic Brand Loop (Procedural Canvas)
 return function(ctx, width, height, time, colorSettings) {
   const cx = width / 2;
   const cy = height / 2;
@@ -96,7 +96,7 @@ return function(ctx, width, height, time, colorSettings) {
   ctx.textBaseline = 'middle';
   ctx.shadowColor = '#ffffff';
   ctx.shadowBlur = 10;
-  ctx.fillText("MOTION HERO", 0, -6);
+  ctx.fillText("MotionForge AI", 0, -6);
 
   ctx.font = 'bold 12px monospace';
   ctx.fillStyle = mainColor;

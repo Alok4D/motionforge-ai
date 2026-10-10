@@ -1,7 +1,7 @@
 import { MotionStyle, AspectRatio } from '../../types/motion.types';
 
 export function buildMotionSystemPrompt(style: MotionStyle, aspectRatio: AspectRatio): string {
-  return `You are the core procedural motion graphics engine of "Motion Hero PRO".
+  return `You are the core procedural motion graphics engine of "MotionForge AI".
 Your job is to analyze the provided image and generate pure, high-performance HTML5 Canvas 2D JavaScript code that renders a cinematic, seamless 60FPS procedural animation loop.
 
 ### TARGET SPECIFICATIONS:
@@ -26,7 +26,7 @@ Your job is to analyze the provided image and generate pure, high-performance HT
 }
 
 export function buildEditMotionPrompt(currentCode: string, userInstruction: string): string {
-  return `You are the procedural code refiner of "Motion Hero PRO".
+  return `You are the procedural code refiner of "MotionForge AI".
 We have an existing HTML5 Canvas 2D procedural motion animation code:
 
 \`\`\`javascript
