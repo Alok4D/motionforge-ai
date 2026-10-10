@@ -589,7 +589,7 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
               : 'btn-logo-gradient'
           }`}
         >
-          <Sparkles className="w-4 h-4 text-white animate-spin" />
+       
           {isGenerating ? 'Generating Motion...' : 'Generate Motion from Image'}
         </button>
 
@@ -598,7 +598,6 @@ export const VideoImageHub: React.FC<VideoImageHubProps> = ({
           disabled={isGenerating}
           className="w-full py-2.5 px-4 rounded-lg text-xs font-bold text-white btn-logo-secondary transition flex items-center justify-center gap-2 cursor-pointer"
         >
-          <Wand2 className="w-4 h-4 text-cyan-200" />
           Create Variation from Current
         </button>
       </div>
