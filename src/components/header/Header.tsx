@@ -43,6 +43,14 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-2.5">
+        {/* Fixed Frame-Grid Pipeline Status */}
+        {pipelineActive && (
+          <div className="hidden lg:flex items-center gap-2 text-xs font-bold tracking-wider uppercase text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            FIXED FRAME-GRID ACTIVE
+          </div>
+        )}
+
         {/* BYOK API Key Button */}
         <button
           onClick={onOpenApiKeyModal}

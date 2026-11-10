@@ -1,5 +1,5 @@
 export type MotionStyle = '3D Cinematic' | '2D Vector' | 'Line Art';
-export type AspectRatio = '16:9' | '9:16' | '1:1';
+export type AspectRatio = '1:1' | '3:4' | '9:16' | '4:3' | '16:9' | '21:9' | 'Auto';
 export type VideoFormat = 'MOV' | 'MP4' | 'WebM';
 export type Framerate = 30 | 60;
 export type Resolution = '4K UHD (3840x2160)' | '1080p FHD (1920x1080)' | '720p HD (1280x720)' | 'Square (2160x2160)' | 'Vertical 4K (2160x3840)';

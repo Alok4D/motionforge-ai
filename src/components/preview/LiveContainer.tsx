@@ -82,10 +82,17 @@ export const LiveContainer: React.FC<LiveContainerProps> = ({
     switch (aspectRatio) {
       case '16:9':
         return 'aspect-video w-full max-h-[520px]';
+      case '21:9':
+        return 'aspect-[21/9] w-full max-h-[520px]';
       case '9:16':
         return 'aspect-[9/16] h-[520px] mx-auto';
+      case '3:4':
+        return 'aspect-[3/4] h-[520px] mx-auto';
+      case '4:3':
+        return 'aspect-[4/3] h-[520px] mx-auto';
       case '1:1':
         return 'aspect-square h-[520px] mx-auto';
+      case 'Auto':
       default:
         return 'aspect-video w-full max-h-[520px]';
     }
@@ -95,10 +102,17 @@ export const LiveContainer: React.FC<LiveContainerProps> = ({
     switch (aspectRatio) {
       case '16:9':
         return { w: 1920, h: 1080 };
+      case '21:9':
+        return { w: 2560, h: 1080 };
       case '9:16':
         return { w: 1080, h: 1920 };
+      case '3:4':
+        return { w: 1080, h: 1440 };
+      case '4:3':
+        return { w: 1440, h: 1080 };
       case '1:1':
         return { w: 1080, h: 1080 };
+      case 'Auto':
       default:
         return { w: 1920, h: 1080 };
     }
@@ -128,11 +142,11 @@ export const LiveContainer: React.FC<LiveContainerProps> = ({
         <div className="flex items-center gap-3">
           {/* Aspect Ratio Switcher */}
           <div className="flex items-center bg-slate-100 p-1 rounded-md border border-slate-200 text-xs font-bold">
-            {(['16:9', '9:16', '1:1'] as AspectRatio[]).map(ar => (
+            {(['16:9', '9:16', '1:1', '4:3', '21:9'] as AspectRatio[]).map(ar => (
               <button
                 key={ar}
                 onClick={() => setAspectRatio(ar)}
-                className={`px-2.5 py-1 rounded-md transition cursor-pointer ${
+                className={`px-2 py-1 rounded-md transition cursor-pointer ${
                   aspectRatio === ar ? 'btn-logo-active shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >

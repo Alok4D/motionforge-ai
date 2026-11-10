@@ -10,7 +10,7 @@ import { SeoPanel } from './components/seo-expert/SeoPanel';
 import { ApiKeyPool } from './components/key-pool/ApiKeyPool';
 
 import { DEFAULT_TEMPLATES } from './constants/defaultPresets';
-import type { AnimationTemplate, MotionStyle, AspectRatio, ColorCustomizerSettings, CreatorToolsSettings } from './types/motion.types';
+import type { MotionStyle, AspectRatio, ColorCustomizerSettings, CreatorToolsSettings } from './types/motion.types';
 import type { StockMetadata } from './types/seo.types';
 import { generateMotionFromImage, editCurrentMotion, generateFromTextPrompt } from './services/gemini/geminiClient';
 import { generateLocalStockMetadata } from './services/seo/seoService';
@@ -18,9 +18,7 @@ import { keyRotator } from './services/gemini/keyRotator';
 import { Toaster, toast } from 'react-hot-toast';
 
 export function App() {
-  // Animation & Template state
-  const [templates] = useState<AnimationTemplate[]>(DEFAULT_TEMPLATES);
-  const [activeTemplate, setActiveTemplate] = useState<AnimationTemplate>(DEFAULT_TEMPLATES[0]);
+  // Current animation state initialized with default preset
   const [currentCode, setCurrentCode] = useState<string>(DEFAULT_TEMPLATES[0].code);
   const [currentTitle, setCurrentTitle] = useState<string>(DEFAULT_TEMPLATES[0].title);
 
@@ -57,17 +55,6 @@ export function App() {
     customAudioUrl: null,
     watermarkText: '',
   });
-
-  // Template select handler
-  const handleSelectTemplate = (tmpl: AnimationTemplate) => {
-    setActiveTemplate(tmpl);
-    setCurrentCode(tmpl.code);
-    setCurrentTitle(tmpl.title);
-    setStyle(tmpl.style);
-    setAspectRatio(tmpl.aspectRatio);
-    setPromptText(tmpl.prompt || tmpl.description);
-    setStockMetadata(generateLocalStockMetadata(tmpl.title, tmpl.style));
-  };
 
   // Generate Motion from Image (AI Vision Call)
   const handleGenerateFromImage = async (motionPrompt?: string) => {
@@ -219,7 +206,6 @@ export function App() {
             onCreateVariation={handleCreateVariation}
             statusMessage={statusMessage}
           />
-
         </aside>
 
         {/* Right Main Stage Viewport & Controls (8 Cols on large screens) */}
