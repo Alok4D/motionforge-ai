@@ -3,7 +3,6 @@ import { Header } from './components/header/Header';
 import { VideoImageHub } from './components/ai-hub/VideoImageHub';
 import { LiveContainer } from './components/preview/LiveContainer';
 import { PromptEditor } from './components/prompt-engine/PromptEditor';
-import { TemplateList } from './components/templates/TemplateList';
 import { ChromaCustomizer } from './components/color-customizer/ChromaCustomizer';
 import { AdvancedCreatorTools } from './components/creator-tools/AdvancedCreatorTools';
 import { VideoExportPanel } from './components/export/VideoExportPanel';
@@ -221,13 +220,6 @@ export function App() {
             statusMessage={statusMessage}
           />
 
-          {/* Animation Templates Hub */}
-          <TemplateList
-            templates={templates}
-            activeTemplateId={activeTemplate.id}
-            onSelectTemplate={handleSelectTemplate}
-            currentCode={currentCode}
-          />
         </aside>
 
         {/* Right Main Stage Viewport & Controls (8 Cols on large screens) */}
