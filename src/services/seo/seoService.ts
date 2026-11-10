@@ -39,12 +39,12 @@ export async function powerUpSeoWithAi(conceptDescription: string): Promise<Stoc
   }
 
   const cleanKey = rawKey.trim();
-  const isBearer = cleanKey.startsWith('AQ.') || cleanKey.startsWith('ya29.');
+  const isBearer = cleanKey.startsWith('ya29.');
 
   try {
     const url = isBearer
-      ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent`
-      : `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${cleanKey}`;
+      ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent`
+      : `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${encodeURIComponent(cleanKey)}`;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

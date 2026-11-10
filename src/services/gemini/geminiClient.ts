@@ -117,20 +117,22 @@ async function executeGeminiRequestWithRotation(
     };
   }
 
-  // Primary: gemini-3.1-flash-lite (fast & robust), Fallbacks: gemini-flash-lite-latest, gemini-3.7-flash, gemini-3.5-flash
+  // Primary: gemini-flash-lite-latest (verified fast & active), Fallbacks: gemini-3.5-flash-lite, gemini-3-flash-preview, gemini-3.8-flash
   const candidateModels = [
-    'gemini-3.1-flash-lite',
     'gemini-flash-lite-latest',
-    'gemini-3.7-flash',
-    'gemini-3.5-flash'
+    'gemini-3.5-flash-lite',
+    'gemini-3-flash-preview',
+    'gemini-3.8-flash',
+    'gemini-flash-latest'
   ];
   let lastErrorMessage = '';
 
   for (const model of candidateModels) {
-    const isBearer = apiKey.startsWith('AQ.') || apiKey.startsWith('ya29.');
+    // Only Google OAuth Access tokens start with 'ya29.'. API keys (both AIzaSy... and AQ...) must use key query param or x-goog-api-key
+    const isBearer = apiKey.startsWith('ya29.');
     const url = isBearer
       ? `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`
-      : `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      : `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

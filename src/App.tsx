@@ -8,7 +8,6 @@ import { AdvancedCreatorTools } from './components/creator-tools/AdvancedCreator
 import { VideoExportPanel } from './components/export/VideoExportPanel';
 import { SeoPanel } from './components/seo-expert/SeoPanel';
 import { ApiKeyPool } from './components/key-pool/ApiKeyPool';
-
 import { DEFAULT_TEMPLATES } from './constants/defaultPresets';
 import type { MotionStyle, AspectRatio, ColorCustomizerSettings, CreatorToolsSettings } from './types/motion.types';
 import type { StockMetadata } from './types/seo.types';

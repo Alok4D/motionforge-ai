@@ -13,11 +13,9 @@ dist-ssr
 *.local
 gemini_keys.txt
 *.env
-.env*
 !.env.example
 
 # Editor directories and files
-.vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -26,3 +24,4 @@ gemini_keys.txt
 *.njsproj
 *.sln
 *.sw?
+config.bat
