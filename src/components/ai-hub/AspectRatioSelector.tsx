@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import type { AspectRatio } from '../../types/motion.types';
-import { Check, ChevronDown, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 interface AspectRatioSelectorProps {
   aspectRatio: AspectRatio;
@@ -10,136 +10,113 @@ interface AspectRatioSelectorProps {
 interface RatioOption {
   ratio: AspectRatio;
   label: string;
-  categoryDividerAfter?: boolean;
 }
 
 export const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({
   aspectRatio,
   setAspectRatio
 }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const options: RatioOption[] = [
-    { ratio: '1:1', label: 'Square', categoryDividerAfter: true },
-    { ratio: '3:4', label: 'Portrait' },
-    { ratio: '9:16', label: 'Mobile', categoryDividerAfter: true },
-    { ratio: '4:3', label: 'Landscape' },
+  const primaryOptions: RatioOption[] = [
+    { ratio: 'Auto', label: 'AI decides' },
     { ratio: '16:9', label: 'Widescreen' },
-    { ratio: '21:9', label: 'Cinematic', categoryDividerAfter: true },
-    { ratio: 'Auto', label: 'AI decides' }
+    { ratio: '9:16', label: 'Mobile' },
+    { ratio: '1:1', label: 'Square' }
   ];
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleOutsideClick);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
-  }, [isOpen]);
+  const secondaryOptions: RatioOption[] = [
+    { ratio: '4:3', label: 'Landscape' },
+    { ratio: '3:4', label: 'Portrait' },
+    { ratio: '21:9', label: 'Cinematic' }
+  ];
 
-  const activeOption = options.find(o => o.ratio === aspectRatio) || options[4]; // default 16:9
-
-  // Helper to render accurate aspect ratio shape icon
-  const renderRatioIcon = (ratio: AspectRatio) => {
+  // SVG shape icon matching ratio geometry
+  const renderRatioIcon = (ratio: AspectRatio, isSelected: boolean) => {
+    const strokeClass = isSelected ? 'stroke-white' : 'stroke-slate-600';
     switch (ratio) {
       case '1:1':
-        return <div className="w-3.5 h-3.5 border-[1.5px] border-slate-600 rounded-2xs" />;
+        return (
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={strokeClass}>
+            <rect x="3.5" y="3.5" width="17" height="17" rx="2" />
+          </svg>
+        );
       case '3:4':
-        return <div className="w-3 h-4 border-[1.5px] border-slate-600 rounded-2xs" />;
+        return (
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={strokeClass}>
+            <rect x="5" y="2.5" width="14" height="19" rx="2" />
+          </svg>
+        );
       case '9:16':
-        return <div className="w-2.5 h-4.5 border-[1.5px] border-slate-600 rounded-2xs" />;
+        return (
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={strokeClass}>
+            <rect x="6.5" y="2" width="11" height="20" rx="2" />
+          </svg>
+        );
       case '4:3':
-        return <div className="w-4 h-3 border-[1.5px] border-slate-600 rounded-2xs" />;
+        return (
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={strokeClass}>
+            <rect x="2.5" y="5" width="19" height="14" rx="2" />
+          </svg>
+        );
       case '16:9':
-        return <div className="w-4.5 h-2.5 border-[1.5px] border-slate-600 rounded-2xs" />;
+        return (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={strokeClass}>
+            <rect x="2" y="6" width="20" height="12" rx="2" />
+          </svg>
+        );
       case '21:9':
-        return <div className="w-5 h-2 border-[1.5px] border-slate-600 rounded-2xs" />;
+        return (
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={strokeClass}>
+            <rect x="2" y="7.5" width="20" height="9" rx="2" />
+          </svg>
+        );
       case 'Auto':
       default:
-        return (
-          <div className="w-4 h-4 border-[1.5px] border-dashed border-slate-600 rounded-2xs flex items-center justify-center">
-            <Sparkles className="w-2.5 h-2.5 text-indigo-500" />
-          </div>
-        );
+        return <Sparkles className={`w-3.5 h-3.5 ${isSelected ? 'text-cyan-200' : 'text-indigo-500'}`} />;
     }
   };
 
+  const renderBox = (opt: RatioOption) => {
+    const isSelected = aspectRatio === opt.ratio;
+    return (
+      <button
+        key={opt.ratio}
+        type="button"
+        onClick={() => setAspectRatio(opt.ratio)}
+        className={`py-2 px-1 rounded-md text-xs font-bold transition flex flex-col items-center justify-center border cursor-pointer ${
+          isSelected
+            ? 'btn-logo-active border-transparent shadow-2xs'
+            : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+        }`}
+      >
+        <div className="flex items-center gap-1.5 mb-0.5">
+          {renderRatioIcon(opt.ratio, isSelected)}
+          <span className="text-xs">{opt.ratio}</span>
+        </div>
+        <span className={`text-[10px] truncate ${isSelected ? 'text-white/80' : 'text-slate-400'}`}>
+          {opt.label}
+        </span>
+      </button>
+    );
+  };
+
   return (
-    <div className="space-y-1.5 relative" ref={dropdownRef}>
+    <div className="space-y-2">
       <div className="flex items-center justify-between text-xs font-bold text-slate-700">
         <span>CANVAS ASPECT RATIO</span>
-        <span className="text-slate-500 font-mono text-xs">
-          {activeOption.ratio === 'Auto' ? 'Auto' : `${activeOption.ratio} (${activeOption.label})`}
+        <span className="text-indigo-600 font-extrabold font-mono">
+          {aspectRatio === 'Auto' ? 'Auto (AI decides)' : aspectRatio}
         </span>
       </div>
 
-      {/* Dropdown Trigger Button */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3.5 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-medium text-slate-800 transition shadow-2xs cursor-pointer"
-      >
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center w-5 h-5 text-slate-700">
-            {renderRatioIcon(activeOption.ratio)}
-          </div>
-          <span className="font-bold text-slate-900">{activeOption.ratio}</span>
-          <span className="text-slate-500">({activeOption.label})</span>
-        </div>
-        <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
+      {/* Row 1: Primary options (Auto, 16:9, 9:16, 1:1) */}
+      <div className="grid grid-cols-4 gap-1.5">
+        {primaryOptions.map(renderBox)}
+      </div>
 
-      {/* Dropdown Menu (Matches the provided screenshot design) */}
-      {isOpen && (
-        <div className="absolute left-0 right-0 top-full mt-1.5 z-30 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150">
-          {options.map((opt, idx) => {
-            const isSelected = aspectRatio === opt.ratio;
-            return (
-              <React.Fragment key={opt.ratio}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAspectRatio(opt.ratio);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2 text-xs transition cursor-pointer text-left ${
-                    isSelected
-                      ? 'bg-slate-100/90 text-slate-900 font-bold'
-                      : 'hover:bg-slate-50 text-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-5 h-5 shrink-0">
-                      {renderRatioIcon(opt.ratio)}
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-slate-900">{opt.ratio}</span>
-                      <span className="text-slate-500 font-normal">({opt.label})</span>
-                    </div>
-                  </div>
-
-                  {isSelected && (
-                    <Check className="w-4 h-4 text-slate-800 shrink-0" />
-                  )}
-                </button>
-
-                {opt.categoryDividerAfter && idx !== options.length - 1 && (
-                  <div className="my-1 border-b border-slate-100" />
-                )}
-              </React.Fragment>
-            );
-          })}
-        </div>
-      )}
+      {/* Row 2: Secondary options (4:3, 3:4, 21:9) */}
+      <div className="grid grid-cols-3 gap-1.5">
+        {secondaryOptions.map(renderBox)}
+      </div>
     </div>
   );
 };
-

@@ -17,6 +17,12 @@ export function parseResolution(res: Resolution): { width: number; height: numbe
       return { width: 2160, height: 2160 };
     case 'Vertical 4K (2160x3840)':
       return { width: 2160, height: 3840 };
+    case 'Cinematic 21:9 (3840x1645)':
+      return { width: 3840, height: 1645 };
+    case 'Portrait 3:4 (1620x2160)':
+      return { width: 1620, height: 2160 };
+    case 'Classic 4:3 (2160x1620)':
+      return { width: 2160, height: 1620 };
     default:
       return { width: 3840, height: 2160 };
   }

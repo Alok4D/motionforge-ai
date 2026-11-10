@@ -223,11 +223,14 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
               onChange={(e) => setResolution(e.target.value as Resolution)}
               className="w-full px-3.5 py-2.5 text-xs font-bold text-slate-800 bg-white border border-slate-300 rounded-md focus:outline-hidden focus:border-indigo-500 shadow-2xs"
             >
-              <option value="4K UHD (3840x2160)">4K UHD (3840x2160) - Recommended for Stock</option>
-              <option value="1080p FHD (1920x1080)">1080p FHD (1920x1080)</option>
+              <option value="4K UHD (3840x2160)">4K UHD 16:9 (3840x2160) - Recommended for Stock</option>
+              <option value="1080p FHD (1920x1080)">1080p FHD 16:9 (1920x1080)</option>
+              <option value="Cinematic 21:9 (3840x1645)">Cinematic 21:9 (3840x1645)</option>
+              <option value="Vertical 4K (2160x3840)">Vertical 4K 9:16 (2160x3840) - Reels/TikTok</option>
+              <option value="Square (2160x2160)">Square 4K 1:1 (2160x2160)</option>
+              <option value="Portrait 3:4 (1620x2160)">Portrait 3:4 (1620x2160)</option>
+              <option value="Classic 4:3 (2160x1620)">Classic 4:3 (2160x1620)</option>
               <option value="720p HD (1280x720)">720p HD (1280x720)</option>
-              <option value="Square (2160x2160)">Square 4K (2160x2160)</option>
-              <option value="Vertical 4K (2160x3840)">Vertical 4K (2160x3840)</option>
             </select>
           </div>
 

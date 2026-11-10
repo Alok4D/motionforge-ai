@@ -25,7 +25,7 @@ export function App() {
   // Input & Generation State
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [style, setStyle] = useState<MotionStyle>('3D Cinematic');
-  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('16:9');
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('Auto');
   const [promptText, setPromptText] = useState<string>(DEFAULT_TEMPLATES[0].prompt || '');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);

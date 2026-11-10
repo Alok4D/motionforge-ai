@@ -52,7 +52,7 @@ Your mission is to perform deep visual deconstruction of the provided image and 
    - Use 'ctx.save()' and 'ctx.restore()' around transformations.
    - Use 'ctx.shadowColor' and 'ctx.shadowBlur' (10 to 35) for luminous neon effects.
    - Use 'ctx.globalCompositeOperation = "lighter"' or '"screen"' for intense additive energy blooms.
-   - Motion Style: ${style}. Aspect Ratio: ${aspectRatio}.
+   - Motion Style: ${style}. Aspect Ratio: ${aspectRatio === 'Auto' ? 'Auto (adapt to source image proportions)' : aspectRatio}.
    - ZERO external dependencies. Pure standard HTML5 Canvas 2D API only.`;
 }
 
