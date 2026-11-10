@@ -22,24 +22,22 @@ export const LiveContainer: React.FC<LiveContainerProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [renderError, setRenderError] = useState<string | null>(null);
+  const [runtimeError, setRuntimeError] = useState<string | null>(null);
   const animationFrameId = useRef<number | null>(null);
-  const startTimeRef = useRef<number>(performance.now());
+  const startTimeRef = useRef<number>(0);
   const pausedTimeOffsetRef = useRef<number>(0);
-  const compiledFunctionRef = useRef<Function | null>(null);
 
-  // Compile procedural code
-  useEffect(() => {
-    setRenderError(null);
+  // Compile procedural code using useMemo
+  const { compiledFunction, compilationError } = React.useMemo(() => {
     try {
-      const compiled = compileMotionCode(proceduralCode);
-      compiledFunctionRef.current = compiled;
+      const fn = compileMotionCode(proceduralCode);
+      return { compiledFunction: fn, compilationError: null };
     } catch (err: any) {
-      console.error('Compilation Error:', err);
-      setRenderError(err.message || 'Error compiling procedural motion function');
-      compiledFunctionRef.current = null;
+      return { compiledFunction: null, compilationError: err?.message || 'Error compiling procedural motion function' };
     }
   }, [proceduralCode]);
+
+  const renderError = compilationError || runtimeError;
 
   // Animation Loop
   useEffect(() => {
@@ -53,13 +51,18 @@ export const LiveContainer: React.FC<LiveContainerProps> = ({
     const renderLoop = (now: number) => {
       if (!isSubscribed) return;
 
-      if (isPlaying && compiledFunctionRef.current) {
+      if (startTimeRef.current === 0) {
+        startTimeRef.current = now;
+      }
+
+      if (isPlaying && compiledFunction) {
         const elapsed = (now - startTimeRef.current + pausedTimeOffsetRef.current) * playbackSpeed;
         try {
-          compiledFunctionRef.current(ctx, canvas.width, canvas.height, elapsed, colorSettings);
+          compiledFunction(ctx, canvas.width, canvas.height, elapsed, colorSettings);
+          if (runtimeError) setRuntimeError(null);
         } catch (execErr: any) {
           console.error('Runtime Execution Error:', execErr);
-          setRenderError(execErr.message || 'Animation runtime error');
+          setRuntimeError(execErr.message || 'Animation runtime error');
         }
       }
 
@@ -72,7 +75,7 @@ export const LiveContainer: React.FC<LiveContainerProps> = ({
       isSubscribed = false;
       if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
     };
-  }, [isPlaying, colorSettings, playbackSpeed]);
+  }, [isPlaying, colorSettings, playbackSpeed, compiledFunction, runtimeError]);
 
   // Determine Aspect Ratio Container Classes
   const getContainerStyle = () => {

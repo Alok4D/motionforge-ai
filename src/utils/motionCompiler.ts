@@ -18,7 +18,7 @@ export function compileMotionCode(code: string): Function {
   try {
     const fn = new Function(cleaned)();
     if (typeof fn === 'function') return fn;
-  } catch (e) {
+  } catch {
     // Continue to next strategies
   }
 
@@ -26,7 +26,7 @@ export function compileMotionCode(code: string): Function {
   try {
     const fn = new Function(`return (${cleaned})`)();
     if (typeof fn === 'function') return fn;
-  } catch (e) {
+  } catch {
     // Continue
   }
 
@@ -42,7 +42,7 @@ export function compileMotionCode(code: string): Function {
     `;
     const fn = new Function(wrapped)();
     if (typeof fn === 'function') return fn;
-  } catch (e) {
+  } catch {
     // Continue
   }
 
@@ -55,7 +55,7 @@ export function compileMotionCode(code: string): Function {
     `;
     const fn = new Function(wrappedBody)();
     if (typeof fn === 'function') return fn;
-  } catch (e) {
+  } catch {
     // Continue
   }
 

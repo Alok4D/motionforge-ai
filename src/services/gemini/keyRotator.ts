@@ -62,7 +62,7 @@ export class KeyRotator {
 
     rawKeys.forEach(rawKey => {
       // Strip any quotes, backticks, brackets or surrounding whitespace
-      const cleanKey = rawKey.replace(/^['"`\[\]\(\)\{\}\s]+|['"`\[\]\(\)\{\}\s]+$/g, '').trim();
+      const cleanKey = rawKey.replace(/^['"`[\](){}\s]+|['"`[\](){}\s]+$/g, '').trim();
       
       if (cleanKey.length > 20) {
         if (existingMap.has(cleanKey)) {

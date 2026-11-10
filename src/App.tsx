@@ -7,15 +7,20 @@ import { TemplateList } from './components/templates/TemplateList';
 import { ChromaCustomizer } from './components/color-customizer/ChromaCustomizer';
 import { AdvancedCreatorTools } from './components/creator-tools/AdvancedCreatorTools';
 import { VideoExportPanel } from './components/export/VideoExportPanel';
+import { SeoPanel } from './components/seo-expert/SeoPanel';
+import { ApiKeyPool } from './components/key-pool/ApiKeyPool';
 
 import { DEFAULT_TEMPLATES } from './constants/defaultPresets';
 import type { AnimationTemplate, MotionStyle, AspectRatio, ColorCustomizerSettings, CreatorToolsSettings } from './types/motion.types';
+import type { StockMetadata } from './types/seo.types';
 import { generateMotionFromImage, editCurrentMotion, generateFromTextPrompt } from './services/gemini/geminiClient';
+import { generateLocalStockMetadata } from './services/seo/seoService';
+import { keyRotator } from './services/gemini/keyRotator';
 import { Toaster, toast } from 'react-hot-toast';
 
 export function App() {
   // Animation & Template state
-  const [templates, setTemplates] = useState<AnimationTemplate[]>(DEFAULT_TEMPLATES);
+  const [templates] = useState<AnimationTemplate[]>(DEFAULT_TEMPLATES);
   const [activeTemplate, setActiveTemplate] = useState<AnimationTemplate>(DEFAULT_TEMPLATES[0]);
   const [currentCode, setCurrentCode] = useState<string>(DEFAULT_TEMPLATES[0].code);
   const [currentTitle, setCurrentTitle] = useState<string>(DEFAULT_TEMPLATES[0].title);
@@ -27,6 +32,15 @@ export function App() {
   const [promptText, setPromptText] = useState<string>(DEFAULT_TEMPLATES[0].prompt || '');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+  // API Key Management Modal State
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState<boolean>(false);
+  const activeKeyCount = keyRotator.getState().totalActive;
+
+  // SEO Microstock Metadata State
+  const [stockMetadata, setStockMetadata] = useState<StockMetadata>(() =>
+    generateLocalStockMetadata(DEFAULT_TEMPLATES[0].title, DEFAULT_TEMPLATES[0].style)
+  );
 
   // Color & Creator Customizer States
   const [colorSettings, setColorSettings] = useState<ColorCustomizerSettings>({
@@ -53,6 +67,7 @@ export function App() {
     setStyle(tmpl.style);
     setAspectRatio(tmpl.aspectRatio);
     setPromptText(tmpl.prompt || tmpl.description);
+    setStockMetadata(generateLocalStockMetadata(tmpl.title, tmpl.style));
   };
 
   // Generate Motion from Image (AI Vision Call)
@@ -73,10 +88,11 @@ export function App() {
       setStatusMessage('✓ Procedural motion graphic synthesized successfully!');
       const newTitle = motionPrompt?.trim() || `Procedural ${style} Motion Matrix`;
       setCurrentTitle(newTitle);
+      setStockMetadata(generateLocalStockMetadata(newTitle, style));
       toast.success('Motion graphic synthesized successfully!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 4000);
     } else {
-      toast.error(`AI Generation Failed: ${res.error || 'Check API Key Pool'}`, { id: loadingToast, duration: 5000 });
+      toast.error(`AI Generation Failed: ${res.error || 'Check API Key'}`, { id: loadingToast, duration: 6000 });
       setStatusMessage(null);
     }
   };
@@ -93,7 +109,7 @@ export function App() {
 
     if (res.success && res.code) {
       setCurrentCode(res.code);
-      setStatusMessage('âœ“ Variation synthesized successfully!');
+      setStatusMessage('✓ Variation synthesized successfully!');
       toast.success('Variation synthesized successfully!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
@@ -117,8 +133,9 @@ export function App() {
 
     if (res.success && res.code) {
       setCurrentCode(res.code);
-      setStatusMessage('âœ“ Motion successfully modified!');
+      setStatusMessage('✓ Motion successfully modified!');
       setCurrentTitle(promptText.trim());
+      setStockMetadata(generateLocalStockMetadata(promptText.trim(), style));
       toast.success('Motion successfully modified!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
@@ -142,8 +159,9 @@ export function App() {
 
     if (res.success && res.code) {
       setCurrentCode(res.code);
-      setStatusMessage('âœ“ Generated from prompt successfully!');
+      setStatusMessage('✓ Generated from prompt successfully!');
       setCurrentTitle(promptText.trim());
+      setStockMetadata(generateLocalStockMetadata(promptText.trim(), style));
       toast.success('Generated from prompt successfully!', { id: loadingToast });
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
@@ -170,8 +188,20 @@ export function App() {
         }} 
       />
 
+      {/* BYOK API Key Modal */}
+      {isApiKeyModalOpen && (
+        <ApiKeyPool
+          isModal={true}
+          onClose={() => setIsApiKeyModalOpen(false)}
+        />
+      )}
+
       {/* Top Header */}
-      <Header pipelineActive={true} />
+      <Header 
+        pipelineActive={true} 
+        onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
+        activeKeyCount={activeKeyCount}
+      />
 
       {/* Main Studio Body Grid */}
       <main className="max-w-[1600px] w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
@@ -195,12 +225,12 @@ export function App() {
           <TemplateList
             templates={templates}
             activeTemplateId={activeTemplate.id}
-            onSelectTemplate={handleSelectTemplate}
+            onSelectTemplate={handleSelectTemplate}
             currentCode={currentCode}
           />
         </aside>
 
-        {/* Right Main Stage Viewport & Controls (7 Cols on large screens) */}
+        {/* Right Main Stage Viewport & Controls (8 Cols on large screens) */}
         <section className="lg:col-span-8 space-y-5">
           {/* 1. Live Container Preview */}
           <LiveContainer
@@ -240,6 +270,13 @@ export function App() {
             creatorSettings={creatorSettings}
             currentTitle={currentTitle}
           />
+
+          {/* 6. Microstock SEO & CSV Export System */}
+          <SeoPanel
+            metadata={stockMetadata}
+            setMetadata={setStockMetadata}
+            conceptPrompt={currentTitle}
+          />
         </section>
       </main>
 
@@ -250,4 +287,5 @@ export function App() {
     </div>
   );
 }
+
 export default App;

@@ -55,11 +55,22 @@ export async function powerUpSeoWithAi(conceptDescription: string): Promise<Stoc
       headers['x-goog-api-key'] = cleanKey;
     }
 
+    const promptText = `You are a microstock SEO metadata expert for Adobe Stock, Shutterstock, Freepik, and Vecteezy.
+Analyze this motion graphic concept: "${conceptDescription}".
+Generate an optimized Title, a rich Description, and exactly 35-45 highly relevant, high-ranking search keywords for microstock video buyers.
+
+Respond ONLY with valid JSON in this exact structure:
+{
+  "title": "A concise, keyword-rich title under 70 characters",
+  "description": "A 2-3 sentence detailed description of colors, motion, loop quality, and use cases",
+  "keywords": ["keyword1", "keyword2", "..."]
+}`;
+
     const response = await fetch(url, {
       method: 'POST',
       headers: headers,
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
+        contents: [{ parts: [{ text: promptText }] }],
         generationConfig: { temperature: 0.3, maxOutputTokens: 1024 }
       })
     });

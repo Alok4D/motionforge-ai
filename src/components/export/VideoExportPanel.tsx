@@ -33,7 +33,7 @@ export const VideoExportPanel: React.FC<VideoExportPanelProps> = ({
     let compiledFunc: Function;
     try {
       compiledFunc = compileMotionCode(proceduralCode);
-    } catch (err: any) {
+    } catch {
       toast.error('Cannot render: Procedural code contains syntax errors.');
       return;
     }

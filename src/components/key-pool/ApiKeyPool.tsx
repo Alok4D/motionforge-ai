@@ -1,22 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { keyRotator } from '../../services/gemini/keyRotator';
 import type { ApiKeyPoolState } from '../../types/apiKey.types';
-import { Key, Upload, Trash2, RefreshCw, ChevronDown, ChevronUp, Plus } from 'lucide-react';
+import { Key, Upload, Trash2, RefreshCw, Plus, X, ExternalLink, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export const ApiKeyPool: React.FC = () => {
-  const [isOpen, setIsOpen] = useState<boolean>(true);
-  const [poolState, setPoolState] = useState<ApiKeyPoolState>(keyRotator.getState());
+interface ApiKeyPoolProps {
+  onClose?: () => void;
+  isModal?: boolean;
+}
+
+export const ApiKeyPool: React.FC<ApiKeyPoolProps> = ({ onClose, isModal = false }) => {
+  const [poolState, setPoolState] = useState<ApiKeyPoolState>(() => keyRotator.getState());
   const [manualInput, setManualInput] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const refreshState = () => {
     setPoolState(keyRotator.getState());
   };
-
-  useEffect(() => {
-    refreshState();
-  }, []);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -33,7 +33,7 @@ export const ApiKeyPool: React.FC = () => {
           .filter(k => k.length > 20);
 
         if (extracted.length === 0) {
-          toast.error('No valid Gemini API keys found in the file. (Keys should start with AIzaSy...)');
+          toast.error('No valid Gemini API keys found in the file.');
           return;
         }
 
@@ -47,7 +47,7 @@ export const ApiKeyPool: React.FC = () => {
         } else if (result.reactivated > 0) {
           toast.success(`Reactivated ${result.reactivated} previously exhausted key(s)! Total: ${result.total}`);
         } else {
-          toast(`All ${result.total} key(s) are already active in the pool.`, { icon: 'ℹ️' });
+          toast('All keys are already active in your pool.', { icon: 'ℹ️' });
         }
       }
     };
@@ -76,14 +76,16 @@ export const ApiKeyPool: React.FC = () => {
     } else if (result.reactivated > 0) {
       toast.success(`Reactivated ${result.reactivated} existing key(s)!`);
     } else {
-      toast(`Keys are already active in the pool.`, { icon: 'ℹ️' });
+      toast('Key is already active in your pool.', { icon: 'ℹ️' });
     }
   };
 
   const handleClear = () => {
-    keyRotator.clearAll();
-    refreshState();
-    toast.success('All API keys cleared from pool.');
+    if (window.confirm('Are you sure you want to clear all your saved API keys?')) {
+      keyRotator.clearAll();
+      refreshState();
+      toast.success('All API keys cleared from pool.');
+    }
   };
 
   const handleResetLimits = () => {
@@ -98,135 +100,202 @@ export const ApiKeyPool: React.FC = () => {
     toast('Key removed from pool', { icon: '🗑️' });
   };
 
-  return (
-    <div className="border border-slate-200 rounded-lg bg-white shadow-2xs overflow-hidden mb-4 transition">
-      {/* Header Bar */}
-      <div 
-        onClick={() => setIsOpen(!isOpen)}
-        className="px-4 py-3 bg-slate-50 hover:bg-slate-100/80 cursor-pointer flex items-center justify-between transition border-b border-slate-200"
-      >
-        <div className="flex items-center gap-2">
-          <Key className="w-4 h-4 text-indigo-600" />
-          <span className="text-sm font-bold text-slate-800">
-            Gemini API Key Pool ({poolState.keys.length} Keys Loaded)
+  const content = (
+    <div className="space-y-4">
+      {/* Banner / Guide */}
+      <div className="bg-gradient-to-r from-indigo-50 to-cyan-50 border border-indigo-100 p-3.5 rounded-xl flex items-start justify-between gap-3">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-950">
+            <ShieldCheck className="w-4 h-4 text-indigo-600" />
+            Bring Your Own Key (Unlimited & 100% Free)
+          </div>
+          <p className="text-[11px] text-indigo-900/80 leading-relaxed m-0">
+            Keys are saved <strong>only in your browser (localStorage)</strong>. You can get a free Gemini API key in 1 minute with any Google account without a credit card.
+          </p>
+        </div>
+        <a
+          href="https://aistudio.google.com/app/apikey"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white btn-logo-gradient rounded-lg shadow-2xs hover:opacity-95 transition"
+        >
+          <span>Get Free Key</span>
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+      </div>
+
+      {/* Stats Bar */}
+      <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-semibold">
+        <div className="flex items-center gap-3">
+          <span className="text-emerald-700 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            {poolState.totalActive} Active
+          </span>
+          <span className="text-rose-600 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+            {poolState.totalExhausted} Exhausted
+          </span>
+          <span className="text-slate-600">
+            {poolState.keys.length} Total Keys
           </span>
         </div>
+
+        <button
+          onClick={handleResetLimits}
+          className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          Reset Limits
+        </button>
+      </div>
+
+      {/* Manual Input */}
+      <div className="space-y-1.5">
+        <label className="text-xs font-bold text-slate-700 block">
+          Add Gemini API Key (or paste multiple separated by commas)
+        </label>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1">
-            {isOpen ? 'Hide' : 'Show'}
-            {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </span>
+          <input
+            type="text"
+            placeholder="AIzaSy... or AQ.Ab8..."
+            value={manualInput}
+            onChange={(e) => setManualInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleManualAdd()}
+            className="flex-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:border-indigo-500 font-mono bg-white"
+          />
+          <button
+            onClick={handleManualAdd}
+            className="px-4 py-2 btn-logo-gradient text-white text-xs font-bold rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          >
+            <Plus className="w-4 h-4" />
+            Add Key
+          </button>
         </div>
       </div>
 
-      {/* Expanded Content */}
-      {isOpen && (
-        <div className="p-4 space-y-3.5 bg-white">
-          <p className="text-xs text-slate-600 leading-relaxed m-0 font-medium">
-            Upload a CSV or TXT file containing 1 to 100+ Free/Paid API keys. The system auto-rotates and auto-switches on quota limit (Error 429).
-          </p>
+      {/* File Upload & Clear */}
+      <div className="flex items-center gap-2">
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept=".csv,.txt"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold rounded-lg border border-slate-300 hover:border-indigo-400 hover:text-indigo-600 transition shadow-2xs cursor-pointer"
+        >
+          <Upload className="w-4 h-4 text-indigo-600" />
+          Upload Bulk Keys (.csv / .txt)
+        </button>
 
-          {/* Stats Bar */}
-          <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-md border border-slate-200 text-xs font-semibold">
-            <div className="flex items-center gap-3">
-              <span className="text-emerald-700 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                {poolState.totalActive} Active
-              </span>
-              <span className="text-rose-600 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-                {poolState.totalExhausted} Exhausted Today
-              </span>
-              <span className="text-slate-600">
-                {poolState.keys.length} Total
-              </span>
-            </div>
+        {poolState.keys.length > 0 && (
+          <button
+            onClick={handleClear}
+            className="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-lg border border-rose-200 transition cursor-pointer"
+          >
+            Clear All
+          </button>
+        )}
+      </div>
 
-            <button
-              onClick={handleResetLimits}
-              className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 underline cursor-pointer"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Reset Limits
-            </button>
+      {/* Key List */}
+      {poolState.keys.length > 0 ? (
+        <div className="space-y-1.5">
+          <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+            Your Stored Keys ({poolState.keys.length})
           </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-2">
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept=".csv,.txt"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold rounded-md border border-slate-300 hover:border-indigo-400 hover:text-indigo-600 transition shadow-2xs cursor-pointer"
-            >
-              <Upload className="w-4 h-4 text-indigo-600" />
-              Upload Keys (.csv / .txt)
-            </button>
-
-            <button
-              onClick={handleClear}
-              className="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-md border border-rose-200 transition cursor-pointer"
-            >
-              Clear All
-            </button>
-          </div>
-
-          {/* Manual Input */}
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Or paste Gemini API Key(s) separated by commas..."
-              value={manualInput}
-              onChange={(e) => setManualInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleManualAdd()}
-              className="flex-1 px-3 py-2 text-xs border border-slate-300 rounded-md focus:outline-hidden focus:border-indigo-500 font-mono"
-            />
-            <button
-              onClick={handleManualAdd}
-              className="px-4 py-2 btn-logo-gradient text-white text-xs font-bold rounded-md transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
-            >
-              <Plus className="w-4 h-4" />
-              Add
-            </button>
-          </div>
-
-          {/* Key List */}
-          {poolState.keys.length > 0 && (
-            <div className="max-h-36 overflow-y-auto space-y-1 pr-1 border border-slate-200 rounded-lg p-1.5 bg-slate-50">
-              {poolState.keys.map((k, idx) => (
-                <div 
-                  key={idx}
-                  className={`flex items-center justify-between px-2.5 py-1 rounded text-[11px] font-mono border ${
-                    k.isActive && !k.isExhaustedToday
-                      ? 'bg-white border-slate-200 text-slate-800'
-                      : 'bg-red-50/70 border-red-200 text-red-700 line-through'
-                  }`}
-                >
-                  <span className="truncate max-w-[280px]">
-                    {k.key.substring(0, 8)}•••••••••••••••••••••••••••••{k.key.slice(-4)}
+          <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1 border border-slate-200 rounded-xl p-2 bg-slate-50">
+            {poolState.keys.map((k, idx) => (
+              <div 
+                key={idx}
+                className={`flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-mono border ${
+                  k.isActive && !k.isExhaustedToday
+                    ? 'bg-white border-slate-200 text-slate-800 shadow-2xs'
+                    : 'bg-rose-50/70 border-rose-200 text-rose-700 line-through'
+                }`}
+              >
+                <div className="flex items-center gap-2 truncate max-w-[320px]">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${k.isActive && !k.isExhaustedToday ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+                  <span className="truncate">
+                    {k.key.substring(0, 10)}••••••••••••••••{k.key.slice(-4)}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-slate-400 no-underline font-sans">
-                      {k.requestCount || 0} reqs
-                    </span>
-                    <button
-                      onClick={() => handleRemoveKey(k.key)}
-                      className="text-slate-400 hover:text-red-600 p-0.5 cursor-pointer"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="text-[11px] text-slate-400 no-underline font-sans">
+                    {k.requestCount || 0} reqs
+                  </span>
+                  <button
+                    onClick={() => handleRemoveKey(k.key)}
+                    className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer transition"
+                    title="Remove key"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="p-4 rounded-xl border border-dashed border-slate-300 text-center text-xs text-slate-500 bg-slate-50">
+          No custom keys saved yet. The studio will use the system default key (or enter your key above for unlimited personal quota).
         </div>
       )}
+    </div>
+  );
+
+  if (isModal) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden animate-in zoom-in-95 duration-200">
+          {/* Modal Header */}
+          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">
+                <Key className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-900 m-0">Gemini API Key Pool (BYOK)</h3>
+                <p className="text-xs text-slate-500 m-0">Manage your free personal API keys for unlimited generation</p>
+              </div>
+            </div>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+
+          {/* Modal Body */}
+          <div className="p-6 max-h-[80vh] overflow-y-auto">
+            {content}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border border-slate-200 rounded-xl bg-white shadow-2xs overflow-hidden p-5 transition">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div className="flex items-center gap-2">
+          <Key className="w-4 h-4 text-indigo-600" />
+          <span className="text-sm font-bold text-slate-800">
+            Gemini API Key Pool ({poolState.keys.length} Keys)
+          </span>
+        </div>
+        {onClose && (
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700">
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+      {content}
     </div>
   );
 };

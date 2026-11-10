@@ -97,10 +97,11 @@ export async function generateFromTextPrompt(
 }
 
 function getEffectiveApiKey(): string | null {
+  const activeObj = keyRotator.getNextActiveKey();
+  if (activeObj && activeObj.key.trim()) return activeObj.key.trim();
   const envKey = (import.meta.env.VITE_GEMINI_API_KEY || '').trim();
   if (envKey) return envKey;
-  const activeObj = keyRotator.getNextActiveKey();
-  return activeObj ? activeObj.key.trim() : null;
+  return null;
 }
 
 async function executeGeminiRequestWithRotation(
@@ -112,7 +113,7 @@ async function executeGeminiRequestWithRotation(
   if (!apiKey) {
     return {
       success: false,
-      error: 'No Gemini API Key found. Please add VITE_GEMINI_API_KEY in your .env file.'
+      error: 'No active Gemini API key found. Please click "API Keys" at the top to add your free Google AI Studio key.'
     };
   }
 
@@ -126,19 +127,35 @@ async function executeGeminiRequestWithRotation(
   let lastErrorMessage = '';
 
   for (const model of candidateModels) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const isBearer = apiKey.startsWith('AQ.') || apiKey.startsWith('ya29.');
+    const url = isBearer
+      ? `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`
+      : `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (isBearer) {
+      headers['Authorization'] = `Bearer ${apiKey}`;
+    } else {
+      headers['x-goog-api-key'] = apiKey;
+    }
 
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: headers,
         body: JSON.stringify(requestBody)
       });
 
-      if (response.status === 404 || response.status === 503 || response.status === 429 || response.status === 500) {
-        // High demand, rate limit, or model not found -> instantly try next fallback model
+      if (response.status === 429) {
+        keyRotator.markKeyExhausted(apiKey);
+        console.warn(`Key exhausted or rate-limited (429), marked in pool. Trying next fallback model/key...`);
+        continue;
+      }
+
+      if (response.status === 404 || response.status === 503 || response.status === 500) {
+        // High demand, service unavailable, or model not found -> instantly try next fallback model
         console.warn(`Model ${model} returned ${response.status}, trying fallback model...`);
         continue;
       }
