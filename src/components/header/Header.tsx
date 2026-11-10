@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Key } from 'lucide-react';
+import { Key } from 'lucide-react';
 
 interface HeaderProps {
   pipelineActive?: boolean;
@@ -43,18 +43,10 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-2.5">
-        {/* Fixed Frame-Grid Pipeline Status */}
-        {pipelineActive && (
-          <div className="hidden lg:flex items-center gap-2 text-xs font-bold tracking-wider uppercase text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            FIXED FRAME-GRID ACTIVE
-          </div>
-        )}
-
         {/* BYOK API Key Button */}
         <button
           onClick={onOpenApiKeyModal}
-          className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:text-indigo-600 hover:border-indigo-300 transition cursor-pointer shadow-2xs"
+          className="flex items-center gap-2 text-xs font-bold px-3 py-3 rounded-md border cursor-pointer border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:text-indigo-600 hover:border-indigo-300 transition"
           title="Bring Your Own Key (BYOK) - Unlimited Free Generation"
         >
           <Key className="w-3.5 h-3.5 text-indigo-600" />
@@ -70,10 +62,9 @@ export const Header: React.FC<HeaderProps> = ({
 
         <button
           onClick={() => alert('MotionForge AI Studio Session Active • Ready to render 4K 60FPS')}
-          className="flex items-center gap-1.5 text-xs font-bold text-white btn-logo-gradient px-3.5 py-2 rounded-lg transition shadow-2xs"
+          className="flex items-center gap-1.5 text-xs font-bold text-white btn-logo-gradient px-3.5 py-3 rounded-md transition cursor-pointer"
         >
-          <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
-          <span className="hidden sm:inline">Pro Studio</span>
+          Explore More Tools
         </button>
       </div>
     </header>
